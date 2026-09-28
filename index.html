@@ -639,7 +639,7 @@ h1,h2,p{margin:0}
     <div class="admin__head">
       <div>
         <h2 id="admin-title">QUIZ RESPONSES</h2>
-        <p>All devices, saved to Google Sheets.</p>
+        <p>Responses from every device.</p>
       </div>
       <button class="admin__x" type="button" id="admin-close" aria-label="Close responses panel">✕</button>
     </div>
@@ -648,7 +648,7 @@ h1,h2,p{margin:0}
 
       <form id="admin-login" hidden>
         <label class="admin__lbl" for="admin-key">ADMIN KEY</label>
-        <p class="admin__note" style="margin:0">Enter the ADMIN_KEY from the Apps Script to see responses from every device.</p>
+        <p class="admin__note" style="margin:0">Enter the admin key to see responses from every device.</p>
         <div class="admin__keyrow">
           <input class="input" id="admin-key" type="password" autocomplete="current-password" required>
           <button class="btn" type="submit">UNLOCK</button>
@@ -885,11 +885,11 @@ h1,h2,p{margin:0}
     }
   }
 
-  /* ---------- Central storage: Google Sheet via Apps Script ----------
-     Paste your Apps Script web app URL below (it ends with /exec).
+  /* ---------- Central storage ----------
+     Paste your web app URL below (it ends with /exec).
      Responses wait in this device's outbox until the Sheet confirms them,
      so nothing is lost when the connection drops.                        */
-     const SHEET_API = "https://script.google.com/macros/s/AKfycbw4DvXh93NDAM1aGh2qxzmxrqNIQ6SN7Aiev9vmILgh05OJaO1ou3PErRIe5MdvpwpD/exec";
+  const SHEET_API = "PASTE_YOUR_WEB_APP_URL_HERE";
   const MIN_LIVE_RESPONSES = 5;
   const OUTBOX_KEY = "mylegacy.design1.outbox.v1";
   const sheetReady = /^https:\/\/script\.google\.com\/.+\/exec$/.test(SHEET_API);
@@ -919,9 +919,9 @@ h1,h2,p{margin:0}
       const res = body
         ? await fetch(SHEET_API, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(body), signal: ctrl.signal })
         : await fetch(`${SHEET_API}?action=stats`, { signal: ctrl.signal });
-      if (!res.ok) throw new Error(`Google Sheet responded with ${res.status}`);
+      if (!res.ok) throw new Error(`Server responded with ${res.status}`);
       const data = await res.json();
-      if (!data.ok) throw Object.assign(new Error(data.error || "Google Sheet rejected the request."), { rejected: true });
+      if (!data.ok) throw Object.assign(new Error(data.error || "The request was rejected."), { rejected: true });
       return data;
     } finally {
       clearTimeout(timer);
@@ -940,7 +940,7 @@ h1,h2,p{margin:0}
           writeOutbox(readOutbox().filter(r => r.id !== rec.id));
         } catch (err) {
           if (err.rejected) {
-            console.warn("Google Sheet rejected a response, removing it:", err.message);
+            console.warn("A response was rejected and removed:", err.message);
             writeOutbox(readOutbox().filter(r => r.id !== rec.id));
           } else {
             console.warn("Response waiting to upload:", err.message);
@@ -1208,7 +1208,7 @@ h1,h2,p{margin:0}
     summary.push([{ v: "Total", s: 4 }, "", { v: total, s: 4 }, { v: total ? 1 : 0, s: 3 }]);
     summary.push([]);
     summary.push([`Exported ${localStamp(new Date().toISOString())}`]);
-    summary.push(["Responses from every device, collected in Google Sheets."]);
+    summary.push(["Responses from every device."]);
 
     return buildWorkbook([
       { name: "Responses", rows, widths },
@@ -1216,7 +1216,7 @@ h1,h2,p{margin:0}
     ]);
   }
 
-  /* ---------- Responses panel (reads the Google Sheet) ---------- */
+  /* ---------- Responses panel (all devices) ---------- */
   var admin = $("#admin");
   const ADMIN_KEY_STORE = "mylegacy.design1.adminKey";
   const fmtWhen = iso => { const d = new Date(iso); return isNaN(d) ? "" : d.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" }); };
@@ -1258,8 +1258,8 @@ h1,h2,p{margin:0}
     }).join("");
 
     let listHtml;
-    if (!sheetReady) listHtml = `<li class="is-empty">Google Sheet isn't connected yet.</li>`;
-    else if (!adminData) listHtml = `<li class="is-empty">${adminLoading ? "Loading responses from Google Sheets…" : "Couldn't load responses. Tap Refresh to try again."}</li>`;
+    if (!sheetReady) listHtml = `<li class="is-empty">Storage isn't connected yet.</li>`;
+    else if (!adminData) listHtml = `<li class="is-empty">${adminLoading ? "Loading responses…" : "Couldn't load responses. Tap Refresh to try again."}</li>`;
     else if (!total) listHtml = `<li class="is-empty">No responses yet. Complete the quiz and it shows up here.</li>`;
     else listHtml = list.slice(-5).reverse().map(r => {
       const p = PERSONAS[r.result] || {};
@@ -1276,8 +1276,8 @@ h1,h2,p{margin:0}
     const note = $("#admin-note");
     note.classList.toggle("is-warn", !sheetReady);
     note.innerHTML = sheetReady
-      ? "Responses from <b>every device</b> are stored in the Google Sheet. The Excel file has two sheets: <b>Responses</b> (one row per quiz, with every answer) and <b>Summary</b> (totals per result). To delete responses, remove the rows in the Google Sheet."
-      : "<b>Google Sheet isn't connected yet.</b> Paste the Apps Script web app URL into <b>SHEET_API</b> in this file. Until then, responses wait on each device.";
+      ? "Showing responses from <b>every device</b>. The Excel file has two sheets: <b>Responses</b> (one row per quiz, with every answer) and <b>Summary</b> (totals per result)."
+      : "<b>Storage isn't connected yet.</b> Until it is, responses wait on each device.";
   }
 
   async function loadAdmin() {
@@ -1293,9 +1293,9 @@ h1,h2,p{margin:0}
       if (err.rejected && /key/i.test(err.message)) {
         rememberKey("");
         adminData = null;
-        adminError = "That key didn't work. Check ADMIN_KEY in the Apps Script.";
+        adminError = "That key didn't work. Try again.";
       } else {
-        toast("Couldn't reach the Google Sheet. Check the connection and tap Refresh.");
+        toast("Couldn't load responses. Check the connection and tap Refresh.");
       }
     } finally {
       adminLoading = false;
