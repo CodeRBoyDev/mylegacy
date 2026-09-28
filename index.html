@@ -307,6 +307,13 @@ h1,h2,p{margin:0}
 }
 .btn--outline{background:transparent;color:var(--error);box-shadow:inset 0 0 0 2px var(--error)}
 .btn--outline:hover{background:#fff1f0}
+.btn--ghost{background:transparent;color:#000;box-shadow:inset 0 0 0 2px #000}
+.btn--ghost:hover{background:#fff}
+.admin__keyrow{display:flex;gap:8px;margin-top:10px}
+.admin__keyrow .input{flex:1;min-width:0;margin:0;height:42px}
+.admin__keyrow .btn{flex:none;height:42px;padding:0 20px;font-size:22px}
+.admin__outbox{margin:0 0 14px;padding:10px 14px;border-radius:12px;border:2px solid var(--error);background:#fff1f0;color:var(--error);font:500 12.5px/1.4 var(--f-ui)}
+.admin__outbox b{color:var(--error)}
 
 
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
@@ -632,21 +639,36 @@ h1,h2,p{margin:0}
     <div class="admin__head">
       <div>
         <h2 id="admin-title">QUIZ RESPONSES</h2>
-        <p>Saved in this browser on this device.</p>
+        <p>All devices, saved to Google Sheets.</p>
       </div>
       <button class="admin__x" type="button" id="admin-close" aria-label="Close responses panel">✕</button>
     </div>
     <div class="admin__body">
-      <div class="admin__stats">
-        <div class="admin__total"><b id="admin-total">0</b><span>completed</span></div>
-        <div class="admin__bars" id="admin-bars"></div>
-      </div>
-      <p class="admin__lbl">Latest responses</p>
-      <ul class="admin__list" id="admin-list"></ul>
-      <p class="admin__note" id="admin-note">The Excel file has two sheets: <b>Responses</b> (one row per quiz, with every answer) and <b>Summary</b> (totals per result).</p>
-      <div class="admin__actions">
-        <button class="btn" type="button" id="admin-xlsx">DOWNLOAD EXCEL</button>
-        <button class="btn btn--outline" type="button" id="admin-clear">CLEAR ALL</button>
+      <p class="admin__outbox" id="admin-outbox" hidden></p>
+
+      <form id="admin-login" hidden>
+        <label class="admin__lbl" for="admin-key">ADMIN KEY</label>
+        <p class="admin__note" style="margin:0">Enter the ADMIN_KEY from the Apps Script to see responses from every device.</p>
+        <div class="admin__keyrow">
+          <input class="input" id="admin-key" type="password" autocomplete="current-password" required>
+          <button class="btn" type="submit">UNLOCK</button>
+        </div>
+        <p class="err" id="admin-key-err" style="text-align:left" hidden></p>
+      </form>
+
+      <div id="admin-data">
+        <div class="admin__stats">
+          <div class="admin__total"><b id="admin-total">0</b><span>completed</span></div>
+          <div class="admin__bars" id="admin-bars"></div>
+        </div>
+        <p class="admin__lbl">Latest responses</p>
+        <ul class="admin__list" id="admin-list"></ul>
+        <p class="admin__note" id="admin-note"></p>
+        <div class="admin__actions">
+          <button class="btn" type="button" id="admin-xlsx">DOWNLOAD EXCEL</button>
+          <a class="btn btn--ghost" id="admin-sheet" href="#" target="_blank" rel="noopener" hidden>OPEN GOOGLE SHEET</a>
+          <button class="btn btn--ghost" type="button" id="admin-refresh">REFRESH</button>
+        </div>
       </div>
     </div>
   </dialog>
@@ -864,56 +886,108 @@ h1,h2,p{margin:0}
     }
   }
 
-  /* ---------- Local response store (this browser only) ---------- */
-  const STORE_KEY = "mylegacy.design1.responses.v1";
-  let memoryStore = [];
-  let storageOk = true;
+  /* ---------- Central storage: Google Sheet via Apps Script ----------
+     Paste your Apps Script web app URL below (it ends with /exec).
+     Responses wait in this device's outbox until the Sheet confirms them,
+     so nothing is lost when the connection drops.                        */
+     const SHEET_API = "https://script.google.com/macros/s/AKfycbw4DvXh93NDAM1aGh2qxzmxrqNIQ6SN7Aiev9vmILgh05OJaO1ou3PErRIe5MdvpwpD/exec";
+  const MIN_LIVE_RESPONSES = 5;
+  const OUTBOX_KEY = "mylegacy.design1.outbox.v1";
+  const sheetReady = /^https:\/\/script\.google\.com\/.+\/exec$/.test(SHEET_API);
 
-  function loadResponses() {
+  let memOutbox = [];
+  function readOutbox() {
     try {
-      const raw = localStorage.getItem(STORE_KEY);
-      const list = raw ? JSON.parse(raw) : [];
+      const list = JSON.parse(localStorage.getItem(OUTBOX_KEY) || "[]");
       return Array.isArray(list) ? list : [];
-    } catch (_) {
-      storageOk = false;
-      return memoryStore.slice();
-    }
+    } catch (_) { return memOutbox.slice(); }
   }
-
-  function saveResponses(list) {
-    memoryStore = list.slice();
-    try {
-      localStorage.setItem(STORE_KEY, JSON.stringify(list));
-      storageOk = true;
-      return true;
-    } catch (_) {
-      storageOk = false;
-      return false;
-    }
+  function writeOutbox(list) {
+    memOutbox = list.slice();
+    try { localStorage.setItem(OUTBOX_KEY, JSON.stringify(list)); } catch (_) {}
   }
 
   function makeId() {
     if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
     return Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
   }
+  const deviceType = () => innerWidth >= 900 ? "Desktop" : innerWidth >= 600 ? "Tablet" : "Phone";
+
+  async function sheetCall(body) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 25000);
+    try {
+      const res = body
+        ? await fetch(SHEET_API, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(body), signal: ctrl.signal })
+        : await fetch(`${SHEET_API}?action=stats`, { signal: ctrl.signal });
+      if (!res.ok) throw new Error(`Google Sheet responded with ${res.status}`);
+      const data = await res.json();
+      if (!data.ok) throw Object.assign(new Error(data.error || "Google Sheet rejected the request."), { rejected: true });
+      return data;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  let flushing = null;
+  function flushOutbox() {
+    if (!sheetReady) return Promise.resolve(null);
+    if (flushing) return flushing;
+    flushing = (async () => {
+      let stats = null;
+      for (const rec of readOutbox()) {
+        try {
+          stats = (await sheetCall(rec)).stats || stats;
+          writeOutbox(readOutbox().filter(r => r.id !== rec.id));
+        } catch (err) {
+          if (err.rejected) {
+            console.warn("Google Sheet rejected a response, removing it:", err.message);
+            writeOutbox(readOutbox().filter(r => r.id !== rec.id));
+          } else {
+            console.warn("Response waiting to upload:", err.message);
+            break;
+          }
+        }
+      }
+      return stats;
+    })().finally(() => { flushing = null; if (admin.open) renderAdmin(); });
+    return flushing;
+  }
 
   function submitResponse(payload) {
-    const list = loadResponses();
-    list.push({ id: makeId(), ...payload });
-    if (!saveResponses(list)) console.warn("Browser storage is unavailable. This response is kept until the page is closed.");
-    return Promise.resolve();
+    writeOutbox([...readOutbox(), { id: makeId(), device: deviceType(), ...payload }]);
+    if (!sheetReady) {
+      console.warn("SHEET_API is not set yet. The response is kept on this device until it is.");
+      return Promise.resolve(null);
+    }
+    return flushOutbox();
+  }
+
+  function applyLiveStats(stats) {
+    if (!stats || stats.total < MIN_LIVE_RESPONSES) return false;
+    Object.keys(PERSONAS).forEach(k => { PERSONAS[k].pct = stats.pct[k] ?? 0; });
+    return true;
+  }
+
+  if (sheetReady) {
+    sheetCall().then(d => applyLiveStats(d.stats)).catch(() => {});
+    flushOutbox();
+    addEventListener("online", flushOutbox);
+    setInterval(() => { if (readOutbox().length) flushOutbox(); }, 30000);
   }
 
   function finish() {
     const key = score(state.answers);
     state.result = key;
     renderResult(key);
+    go("s-res");
     submitResponse({
       name: state.name, age: state.age, email: state.email,
       answers: state.answers.slice(), answerTexts: state.answerTexts.slice(),
       result: key, submittedAt: new Date().toISOString()
+    }).then(stats => {
+      if (applyLiveStats(stats) && state.result === key) renderResult(key);
     });
-    go("s-res");
   }
 
   /* ---------- Result ---------- */
@@ -1135,7 +1209,7 @@ h1,h2,p{margin:0}
     summary.push([{ v: "Total", s: 4 }, "", { v: total, s: 4 }, { v: total ? 1 : 0, s: 3 }]);
     summary.push([]);
     summary.push([`Exported ${localStamp(new Date().toISOString())}`]);
-    summary.push(["Responses are saved in the browser on the device that ran the quiz."]);
+    summary.push(["Responses from every device, collected in Google Sheets."]);
 
     return buildWorkbook([
       { name: "Responses", rows, widths },
@@ -1143,39 +1217,104 @@ h1,h2,p{margin:0}
     ]);
   }
 
-  /* ---------- Responses panel ---------- */
-  const admin = $("#admin");
+  /* ---------- Responses panel (reads the Google Sheet) ---------- */
+  var admin = $("#admin");
+  const ADMIN_KEY_STORE = "mylegacy.design1.adminKey";
   const fmtWhen = iso => { const d = new Date(iso); return isNaN(d) ? "" : d.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" }); };
   const escHtml = v => String(v ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
+  let adminKey = (() => { try { return sessionStorage.getItem(ADMIN_KEY_STORE) || ""; } catch (_) { return ""; } })();
+  let adminData = null;
+  let adminLoading = false;
+  let adminError = "";
+
+  function rememberKey(k) {
+    adminKey = k;
+    try { k ? sessionStorage.setItem(ADMIN_KEY_STORE, k) : sessionStorage.removeItem(ADMIN_KEY_STORE); } catch (_) {}
+  }
+
   function renderAdmin() {
-    const list = loadResponses();
+    const waiting = readOutbox().length;
+    const outbox = $("#admin-outbox");
+    outbox.hidden = !waiting;
+    outbox.innerHTML = waiting
+      ? `<b>${waiting} response${waiting === 1 ? "" : "s"} on this device ${waiting === 1 ? "is" : "are"} waiting to upload.</b> ${sheetReady ? "They send automatically once the connection is back." : "They send once SHEET_API is set."}`
+      : "";
+
+    const needKey = sheetReady && !adminKey;
+    $("#admin-login").hidden = !needKey;
+    $("#admin-data").hidden = needKey;
+    const keyErr = $("#admin-key-err");
+    keyErr.hidden = !adminError;
+    keyErr.textContent = adminError;
+    if (needKey) return;
+
+    const list = adminData ? adminData.responses : [];
     const total = list.length;
-    $("#admin-total").textContent = total;
+    $("#admin-total").textContent = adminData ? total : "–";
     $("#admin-bars").innerHTML = Object.entries(PERSONAS).map(([k, p]) => {
       const n = list.filter(r => r.result === k).length;
       const pct = total ? Math.round(n / total * 100) : 0;
-      return `<div class="abar" style="--c:${p.color}"><span class="abar__name">${p.name.toUpperCase()}</span><span class="abar__track"><span class="abar__fill" style="display:block;width:${pct}%"></span></span><span class="abar__num">${n}</span></div>`;
+      return `<div class="abar" style="--c:${p.color}"><span class="abar__name">${p.name.toUpperCase()}</span><span class="abar__track"><span class="abar__fill" style="display:block;width:${pct}%"></span></span><span class="abar__num">${adminData ? n : ""}</span></div>`;
     }).join("");
-    $("#admin-list").innerHTML = total
-      ? list.slice(-5).reverse().map(r => {
-          const p = PERSONAS[r.result] || {};
-          return `<li style="--c:${p.color || "#000"}"><div><b>${escHtml(r.name)}</b><small>${escHtml((p.name || r.result || "").toUpperCase())}</small></div><span>${escHtml(fmtWhen(r.submittedAt))}</span></li>`;
-        }).join("")
-      : `<li class="is-empty">No responses yet. Complete the quiz and it shows up here.</li>`;
-    $("#admin-xlsx").disabled = !total;
-    $("#admin-xlsx").style.opacity = total ? "" : ".4";
+
+    let listHtml;
+    if (!sheetReady) listHtml = `<li class="is-empty">Google Sheet isn't connected yet.</li>`;
+    else if (!adminData) listHtml = `<li class="is-empty">${adminLoading ? "Loading responses from Google Sheets…" : "Couldn't load responses. Tap Refresh to try again."}</li>`;
+    else if (!total) listHtml = `<li class="is-empty">No responses yet. Complete the quiz and it shows up here.</li>`;
+    else listHtml = list.slice(-5).reverse().map(r => {
+      const p = PERSONAS[r.result] || {};
+      return `<li style="--c:${p.color || "#000"}"><div><b>${escHtml(r.name)}</b><small>${escHtml((p.name || r.result || "").toUpperCase())}</small></div><span>${escHtml(fmtWhen(r.submittedAt))}</span></li>`;
+    }).join("");
+    $("#admin-list").innerHTML = listHtml;
+
+    const canDownload = total > 0;
+    $("#admin-xlsx").disabled = !canDownload;
+    $("#admin-xlsx").style.opacity = canDownload ? "" : ".4";
+    $("#admin-refresh").disabled = !sheetReady || adminLoading;
+    $("#admin-refresh").textContent = adminLoading ? "LOADING…" : "REFRESH";
+    const sheetLink = $("#admin-sheet");
+    sheetLink.hidden = !(adminData && adminData.sheetUrl);
+    if (adminData && adminData.sheetUrl) sheetLink.href = adminData.sheetUrl;
+
     const note = $("#admin-note");
-    note.classList.toggle("is-warn", !storageOk);
-    note.innerHTML = storageOk
-      ? "The Excel file has two sheets: <b>Responses</b> (one row per quiz, with every answer) and <b>Summary</b> (totals per result). Download before clearing the browser's data."
-      : "<b>This browser is blocking storage</b> (private window or blocked site data), so responses only last until this page is closed. Download the Excel file before closing.";
+    note.classList.toggle("is-warn", !sheetReady);
+    note.innerHTML = sheetReady
+      ? "Responses from <b>every device</b> are stored in the Google Sheet. The Excel file has two sheets: <b>Responses</b> (one row per quiz, with every answer) and <b>Summary</b> (totals per result). To delete responses, remove the rows in the Google Sheet."
+      : "<b>Google Sheet isn't connected yet.</b> Paste the Apps Script web app URL into <b>SHEET_API</b> in this file. Until then, responses wait on each device.";
+  }
+
+  async function loadAdmin() {
+    if (!sheetReady || !adminKey || adminLoading) return;
+    adminLoading = true;
+    renderAdmin();
+    try {
+      const data = await sheetCall({ action: "list", key: adminKey });
+      adminData = data;
+      adminError = "";
+      applyLiveStats(data.stats);
+    } catch (err) {
+      if (err.rejected && /key/i.test(err.message)) {
+        rememberKey("");
+        adminData = null;
+        adminError = "That key didn't work. Check ADMIN_KEY in the Apps Script.";
+      } else {
+        toast("Couldn't reach the Google Sheet. Check the connection and tap Refresh.");
+      }
+    } finally {
+      adminLoading = false;
+      renderAdmin();
+    }
   }
 
   function openAdmin() {
     renderAdmin();
-    if (admin.open) return;
-    if (typeof admin.showModal === "function") admin.showModal(); else admin.setAttribute("open", "");
+    if (!admin.open) {
+      if (typeof admin.showModal === "function") admin.showModal(); else admin.setAttribute("open", "");
+    }
+    if (sheetReady && !adminKey) setTimeout(() => $("#admin-key").focus(), 50);
+    flushOutbox();
+    loadAdmin();
   }
   function closeAdmin() {
     if (typeof admin.close === "function") admin.close(); else admin.removeAttribute("open");
@@ -1184,21 +1323,24 @@ h1,h2,p{margin:0}
   $("#admin-close").addEventListener("click", closeAdmin);
   admin.addEventListener("click", e => { if (e.target === admin) closeAdmin(); });
 
+  $("#admin-login").addEventListener("submit", e => {
+    e.preventDefault();
+    const k = $("#admin-key").value.trim();
+    if (!k) return;
+    $("#admin-key").value = "";
+    adminError = "";
+    rememberKey(k);
+    loadAdmin();
+  });
+
+  $("#admin-refresh").addEventListener("click", () => { flushOutbox(); loadAdmin(); });
+
   $("#admin-xlsx").addEventListener("click", () => {
-    const list = loadResponses();
+    const list = adminData ? adminData.responses : [];
     if (!list.length) { toast("There are no responses to download yet."); return; }
     const d = new Date();
     download(responsesWorkbook(list), `legacy-quiz-responses-${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}.xlsx`);
-    toast(`Excel downloaded with ${list.length} response${list.length === 1 ? "" : "s"}.`);
-  });
-
-  $("#admin-clear").addEventListener("click", () => {
-    const n = loadResponses().length;
-    if (!n) { toast("There are no responses to clear."); return; }
-    if (!confirm(`Delete all ${n} saved responses from this browser? Download the Excel file first if you need them.`)) return;
-    saveResponses([]);
-    renderAdmin();
-    toast("All responses cleared.");
+    toast(`Excel downloaded with ${list.length} response${list.length === 1 ? "" : "s"} from all devices.`);
   });
 
   document.addEventListener("keydown", e => {
