@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Plan Your Legacy | MyLegacy @ LifeSG</title>
+<meta name="description" content="Take a 5-question quiz and find out which legacy plan to start with.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600;700&family=DM+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FDF1E1;
+  --ink:#000;
+  --coral:#F2875A;
+  --slate:#3A4A63;
+  --blue:#1877F2;
+  --royal:#0A4696;
+  --red:#A8272B;
+  --navy:#1E4E8C;
+  --error:#C62828;
+  --accent:var(--blue);
+
+  --f-display:"Bebas Neue", Impact, "Arial Narrow", sans-serif;
+  --f-body:"Oswald", "Arial Narrow", Arial, sans-serif;
+  --f-ui:"DM Sans", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:var(--cream);color:var(--ink);
+  font-family:var(--f-body);-webkit-font-smoothing:antialiased;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+button{font:inherit;color:inherit}
+h1,h2,p{margin:0}
+[hidden]{display:none!important}
+
+.app{position:relative;min-height:100dvh;overflow-x:hidden}
+
+/* ---------- Asset placeholder ---------- */
+.ph{
+  position:relative;display:grid;place-items:center;flex:none;
+  background:
+    linear-gradient(to top right, transparent calc(50% - .8px), rgba(0,0,0,.25) 50%, transparent calc(50% + .8px)),
+    linear-gradient(to bottom right, transparent calc(50% - .8px), rgba(0,0,0,.25) 50%, transparent calc(50% + .8px)),
+    var(--ph-bg, rgba(0,0,0,.08));
+  border:1.5px dashed rgba(0,0,0,.45);
+  border-radius:var(--ph-r,12px);overflow:hidden;
+}
+.ph > span{
+  background:#fff;color:#222;font:700 9px/1.2 var(--f-ui);letter-spacing:.3px;
+  padding:3px 7px;border-radius:4px;text-align:center;max-width:90%;
+  box-shadow:0 0 0 1px rgba(0,0,0,.12);
+}
+.ph--light{
+  background:
+    linear-gradient(to top right, transparent calc(50% - .8px), rgba(255,255,255,.55) 50%, transparent calc(50% + .8px)),
+    linear-gradient(to bottom right, transparent calc(50% - .8px), rgba(255,255,255,.55) 50%, transparent calc(50% + .8px)),
+    var(--ph-bg, rgba(255,255,255,.15));
+  border-color:rgba(255,255,255,.75);
+}
+.ph--accent{--ph-bg:color-mix(in srgb, var(--accent) 38%, transparent)}
+.ph--coral{--ph-bg:rgba(242,135,90,.38)}
+.ph--red{--ph-bg:rgba(168,39,43,.35)}
+
+/* ---------- MyLegacy @LifeSG logo ---------- */
+.logo{display:inline-flex;align-items:center;justify-content:center;flex:none;text-decoration:none;line-height:0}
+.logo__img{display:block;height:20px;width:auto;aspect-ratio:305/40;overflow:visible}
+.logo--lg .logo__img{height:30px}
+.logo--white{--lg-navy:#fff;--lg-gray:#fff;--lg-red:#fff}
+
+/* ---------- Atoms ---------- */
+.btn{
+  display:inline-grid;place-items:center;border:0;cursor:pointer;text-decoration:none;
+  background:#000;color:#fff;border-radius:999px;
+  font-family:var(--f-display);letter-spacing:.5px;line-height:1;
+  transition:transform .15s ease, background-color .15s ease;
+}
+.btn:hover{background:#222;transform:translateY(-1px)}
+.btn:active{transform:translateY(1px)}
+:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+
+.plan{
+  display:grid;place-items:center;text-align:center;color:#fff;
+  font-family:var(--f-display);line-height:.95;border-radius:999px;
+}
+.plan--lpa{background:var(--coral)}
+.plan--acp{background:var(--slate)}
+.plan--cpf{background:var(--blue)}
+.plan--will{background:var(--red)}
+
+.halftone{
+  position:absolute;pointer-events:none;
+  background-image:radial-gradient(circle, currentColor 1.2px, transparent 1.5px);
+  background-size:8px 8px;
+}
+.halftone--tr{-webkit-mask-image:linear-gradient(225deg,#000 10%,transparent 70%);mask-image:linear-gradient(225deg,#000 10%,transparent 70%)}
+.halftone--bl{-webkit-mask-image:linear-gradient(45deg,#000 10%,transparent 70%);mask-image:linear-gradient(45deg,#000 10%,transparent 70%)}
+.deco-dot{position:absolute;border-radius:50%;background:#000}
+.deco-ring{position:absolute;border-radius:50%;border:1.5px solid #000}
+.deco-spark{position:absolute;width:20px;height:20px;background:#000;clip-path:polygon(50% 0,60% 40%,100% 50%,60% 60%,50% 100%,40% 60%,0 50%,40% 40%)}
+.squig{position:absolute;fill:none;stroke:#000;stroke-width:1.8}
+
+/* ---------- Screens (mobile first) ---------- */
+.screen{
+  display:none;flex-direction:column;position:relative;z-index:1;
+  width:100%;max-width:480px;min-height:100dvh;margin:0 auto;background:var(--cream);
+}
+.screen.is-active{display:flex;animation:screenIn .35s ease both}
+@keyframes screenIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.col{display:flex;flex-direction:column;align-items:center;width:100%}
+.col--grow{flex:1}
+.foot{margin-top:auto;padding:22px 0 22px}
+
+.blk{width:100%;color:#fff;text-align:center;border-radius:0 0 28px 28px;padding:28px 16px 24px;flex:none}
+.blk--black{background:#000}
+.blk--royal{background:var(--royal)}
+.blk h1{font-family:var(--f-display);font-weight:400;font-size:clamp(54px,17vw,66px);line-height:.88;letter-spacing:.5px;outline:none}
+.blk p{font-weight:500;font-size:16px;line-height:1.15;margin-top:8px}
+
+/* Instructions */
+.friend{
+  margin:20px 24px 0;padding:10px 16px;border-radius:14px;
+  background:#fff;border:2px solid #000;
+  font-weight:500;font-size:14px;line-height:1.2;text-align:center;
+}
+.friend b{color:var(--friend-c,var(--blue));font-weight:700}
+.plans{list-style:none;padding:0;margin:28px 0 22px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.plans .plan{width:196px;min-height:50px;font-size:21px;padding:4px 20px}
+.copy{font-weight:500;font-size:16.5px;line-height:1.14;text-align:center;padding:0 28px;max-width:380px}
+.copy + .copy{margin-top:10px}
+.btn--cta{width:176px;height:42px;font-size:29px;margin-top:22px}
+
+/* Pre-quiz */
+.form{display:flex;flex-direction:column;align-items:center;padding-top:34px;width:100%}
+.field{display:flex;flex-direction:column;align-items:center;width:232px;margin-bottom:22px}
+.label{font-family:var(--f-display);font-size:31px;line-height:1;letter-spacing:.3px}
+.hint{font-size:11.5px;font-weight:500;margin-top:2px}
+.input{
+  width:100%;height:42px;margin-top:8px;padding:0 18px;
+  background:#fff;border:2px solid #000;border-radius:999px;
+  font:500 16px var(--f-body);color:#000;outline:none;
+}
+.input:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.input.is-invalid{border-color:var(--error)}
+.select{position:relative;width:100%;height:42px;margin-top:8px;display:block}
+.select select{
+  -webkit-appearance:none;appearance:none;width:100%;height:100%;
+  background:#fff;border:2px solid #000;border-radius:999px;
+  padding:0 46px 0 18px;font:500 16px var(--f-body);color:#000;cursor:pointer;outline:none;
+}
+.select select:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.select::after{content:"";position:absolute;right:0;top:0;bottom:0;width:36px;background:#000;border-radius:0 999px 999px 0;pointer-events:none}
+.select::before{
+  content:"";position:absolute;right:11px;top:50%;z-index:1;pointer-events:none;
+  border-left:7px solid transparent;border-right:7px solid transparent;border-top:9px solid #fff;transform:translateY(-40%);
+}
+.err{color:var(--error);font-size:13px;font-weight:500;margin-top:6px;text-align:center}
+.req{font-size:12px;font-weight:500;margin:0 0 4px}
+.form .btn--cta{margin-top:10px}
+
+/* Quiz */
+.q-visual{position:relative;height:226px;flex:none}
+.q-coral{position:absolute;inset:0 0 30px 0;background:var(--coral);border-radius:0 0 30px 0;overflow:hidden}
+.q-coral .halftone{color:#fff;top:0;right:0;width:160px;height:110px}
+.q-coral .halftone--bl{left:0;bottom:0;top:auto;right:auto}
+.q-cloud{position:absolute;left:50%;top:16px;transform:translateX(-50%);width:170px;height:126px;--ph-r:70px}
+.q-cloud-2{display:none}
+.q-tab{
+  background:#000;color:#fff;font-family:var(--f-display);font-size:42px;line-height:1;letter-spacing:.5px;
+  padding:7px 24px 5px 16px;border-radius:0 28px 28px 0;
+}
+.q-visual .q-tab{position:absolute;left:0;bottom:4px}
+.q-body{width:100%;display:flex;flex-direction:column;align-items:center}
+.q-body.is-swap{animation:qSwap .3s ease both}
+@keyframes qSwap{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+.q-text{font-weight:600;font-size:24px;line-height:1.04;text-align:center;padding:22px 28px 20px;max-width:380px;outline:none}
+.opts{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%}
+.opt{
+  width:270px;min-height:48px;padding:7px 20px;border:0;border-radius:999px;cursor:pointer;
+  background:#000;color:#fff;font:500 14px/1.15 var(--f-body);text-align:center;
+  transition:transform .15s ease, background-color .15s ease;
+}
+.opt:hover:not(:disabled){transform:scale(1.03)}
+.opt.is-picked{background:var(--blue)}
+.opt:disabled{cursor:default}
+.opt:disabled:not(.is-picked){opacity:.55}
+.back{background:none;border:0;cursor:pointer;font:500 14px var(--f-body);text-decoration:underline;text-underline-offset:3px;margin-top:16px;padding:4px 8px}
+
+/* Result */
+.scr-res{--accent:var(--blue)}
+.slides{flex:1;display:flex;width:100%;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain}
+.slides::-webkit-scrollbar{display:none}
+.slide{flex:0 0 100%;scroll-snap-align:start;display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:28px}
+.eyebrow{font-family:var(--f-display);font-size:20px;letter-spacing:.6px;line-height:1;color:var(--accent);padding:0 20px}
+.big{font-family:var(--f-display);font-weight:400;font-size:clamp(66px,21vw,82px);line-height:.84;letter-spacing:.6px;color:var(--accent);margin-top:6px;outline:none}
+.tag{font-weight:500;font-size:17px;line-height:1.12;padding:0 34px;margin-top:12px}
+.art{width:206px;height:180px;margin:16px auto 14px;--ph-r:50%}
+.stat-line{font-weight:500;font-size:16px;line-height:1.15;padding:0 30px}
+.intro{font-weight:500;font-size:17px;line-height:1.12;padding:0 50px}
+.art--sm{width:172px;height:138px;margin:12px auto 8px}
+.ctitle{font-family:var(--f-display);font-size:35px;line-height:1;color:var(--accent);letter-spacing:.3px}
+.me-bar{display:flex;align-items:center;justify-content:center;gap:7px;margin:5px 0 14px}
+.me-bar b{
+  display:flex;align-items:center;justify-content:flex-end;min-width:92px;height:23px;padding:0 10px;
+  border-radius:999px;background:var(--accent);color:#fff;font:400 16px/1 var(--f-display);
+}
+.me-bar span{font-family:var(--f-display);font-size:17px}
+.rows{display:flex;flex-direction:column;gap:10px;width:100%;padding:0 22px}
+.row{display:flex;align-items:center;gap:10px}
+.row .ph{width:48px;height:48px;--ph-r:50%}
+.row .ph > span{font-size:6.5px;padding:1px 3px}
+.row__body{flex:1;text-align:left}
+.row__lbl{display:block;font-family:var(--f-display);font-size:14px;line-height:1;margin-bottom:4px;color:var(--c)}
+.row__bar{
+  height:18px;border-radius:999px;background:var(--c);color:#fff;
+  display:flex;align-items:center;justify-content:flex-end;padding-right:8px;
+  font:400 13px/1 var(--f-display);min-width:42px;
+  transform-origin:left;animation:grow .7s cubic-bezier(.2,.8,.2,1) both;
+}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.slide--write{padding-top:0}
+.hero{width:100%;background:var(--accent);color:#fff;border-radius:0 0 30px 30px;padding:28px 0 26px}
+.hero .art{width:190px;height:152px;margin:0 auto 16px;--ph-bg:rgba(253,241,225,.35)}
+.hero .eyebrow,.hero .big{color:#fff}
+.hero .eyebrow{font-size:17px}
+.start{font-weight:600;font-size:19px;line-height:1.1;margin-top:22px;padding:0 24px}
+.write{font-weight:500;font-size:16px;line-height:1.16;padding:0 30px;margin-top:10px;max-width:420px}
+
+.res-actions{display:flex;flex-direction:column;align-items:center;padding:14px 0 20px;flex:none}
+.dots{display:flex;gap:7px;margin-bottom:14px}
+.dots button{width:10px;height:10px;padding:0;border-radius:50%;border:1.5px solid #000;background:transparent;cursor:pointer}
+.dots button[aria-current="true"]{background:#000}
+.share{display:flex;flex-direction:column;align-items:center;gap:8px}
+.share__t{font-weight:600;font-size:17px;line-height:1}
+.share__row{display:flex;gap:8px}
+.icon-btn{width:42px;height:42px;display:grid;place-items:center;border:0;border-radius:9px;background:#000;color:#fff;cursor:pointer;transition:transform .15s ease}
+.icon-btn:hover{transform:translateY(-2px)}
+.icon-btn svg{width:60%;height:60%}
+.btn--learn{width:176px;height:34px;font-size:23px;margin:14px 0 12px}
+.retake{background:none;border:0;cursor:pointer;font:500 13px var(--f-body);text-decoration:underline;text-underline-offset:3px;margin-top:10px;padding:4px 8px}
+
+/* Toast */
+.toast{
+  position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));z-index:50;
+  transform:translate(-50%,20px);opacity:0;pointer-events:none;
+  background:#000;color:#fff;border-radius:999px;padding:11px 20px;
+  font:500 14px/1.2 var(--f-body);max-width:calc(100% - 32px);text-align:center;
+  transition:opacity .25s ease, transform .25s ease;
+}
+.toast.is-on{opacity:1;transform:translate(-50%,0)}
+
+/* ---------- Responses panel (staff only) ---------- */
+.admin{
+  width:min(560px,calc(100% - 28px));max-height:calc(100dvh - 40px);padding:0;
+  border:2px solid #000;border-radius:22px;background:var(--cream);color:#000;
+  box-shadow:0 30px 60px -20px rgba(0,0,0,.45);
+}
+.admin::backdrop{background:rgba(0,0,0,.55)}
+.admin[open]{display:flex;flex-direction:column;animation:screenIn .25s ease both}
+.admin__head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:20px 22px 14px;background:#000;color:#fff}
+.admin__head h2{font:400 36px/.9 var(--f-display);letter-spacing:.5px}
+.admin__head p{font:500 13px/1.35 var(--f-ui);color:#d9d9d9;margin-top:6px}
+.admin__x{flex:none;width:36px;height:36px;border-radius:50%;border:2px solid #fff;background:transparent;color:#fff;display:grid;place-items:center;cursor:pointer;font:700 18px/1 var(--f-ui)}
+.admin__body{padding:18px 22px 22px;overflow:auto}
+.admin__stats{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;margin-bottom:16px}
+.admin__total{background:#fff;border:2px solid #000;border-radius:16px;padding:10px 18px;text-align:center;min-width:120px}
+.admin__total b{display:block;font:400 58px/.9 var(--f-display)}
+.admin__total span{font:500 12px var(--f-ui)}
+.admin__bars{display:flex;flex-direction:column;gap:7px}
+.abar{display:grid;grid-template-columns:118px 1fr 44px;gap:8px;align-items:center;font:400 14px/1 var(--f-display);letter-spacing:.3px}
+.abar__name{color:var(--c)}
+.abar__track{height:14px;border-radius:999px;background:#EFE3D1;overflow:hidden}
+.abar__fill{height:100%;border-radius:999px;background:var(--c)}
+.abar__num{text-align:right;font:600 12px var(--f-ui)}
+.admin__list{list-style:none;padding:0;margin:0 0 16px;background:#fff;border:2px solid #000;border-radius:14px;overflow:hidden}
+.admin__list li{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 14px;border-bottom:1px solid #EFE3D1;font:500 13px/1.3 var(--f-ui)}
+.admin__list li > div{min-width:0}
+.admin__list li b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.admin__list li small{display:block;font:400 15px/1.1 var(--f-display);letter-spacing:.3px;color:var(--c,#000);margin-top:2px}
+.admin__list li:last-child{border-bottom:0}
+.admin__list li span{color:#6b6257;white-space:nowrap}
+.admin__list .is-empty{justify-content:center;color:#6b6257;padding:18px}
+.admin__lbl{font:400 18px/1 var(--f-display);letter-spacing:.4px;margin:0 0 8px}
+.admin__note{font:500 12.5px/1.45 var(--f-ui);color:#6b6257;margin-bottom:16px}
+.admin__note b{color:#000}
+.admin__note.is-warn{color:var(--error)}
+.admin__actions{display:flex;gap:10px;flex-wrap:wrap}
+.admin__actions .btn{height:42px;padding:0 22px;font-size:22px}
+@media (max-width:520px){
+  .admin__head h2{font-size:32px}
+  .admin__stats{grid-template-columns:1fr}
+  .admin__total{display:flex;align-items:baseline;justify-content:center;gap:8px}
+  .admin__total b{font-size:46px}
+  .abar{grid-template-columns:132px 1fr 30px}
+  .admin__list li span{font-size:11.5px}
+  .admin__actions .btn{flex:1}
+}
+.btn--outline{background:transparent;color:var(--error);box-shadow:inset 0 0 0 2px var(--error)}
+.btn--outline:hover{background:#fff1f0}
+
+
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+@media (max-width:899px){
+  .d-only{display:none!important}
+}
+
+/* ---------- Desktop ---------- */
+@media (min-width:900px){
+  .m-only{display:none!important}
+  .app::before,.app::after{
+    content:"";position:fixed;z-index:2;pointer-events:none;width:220px;height:180px;
+    background-image:radial-gradient(circle,#000 1.3px,transparent 1.6px);background-size:9px 9px;
+  }
+  .app::before{top:0;right:0;-webkit-mask-image:linear-gradient(225deg,#000 5%,transparent 65%);mask-image:linear-gradient(225deg,#000 5%,transparent 65%)}
+  .app::after{bottom:0;left:0;-webkit-mask-image:linear-gradient(45deg,#000 5%,transparent 65%);mask-image:linear-gradient(45deg,#000 5%,transparent 65%)}
+
+  .screen{max-width:none;min-height:0}
+  .screen.is-active{display:grid;grid-template-columns:1fr 1fr;height:100dvh;min-height:640px}
+  .side{position:relative;display:flex;flex-direction:column;align-items:center;overflow:hidden;min-height:0}
+  .col--grow{flex:none;justify-content:center;height:100%;padding:30px 0}
+
+  .side .blk{width:min(470px,82%);padding:34px 20px 28px;border-radius:0 0 36px 36px;position:relative;z-index:2}
+  .blk h1{font-size:clamp(76px,7vw,108px)}
+  .blk p{font-size:clamp(17px,1.4vw,21px)}
+  .d-art{position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:min(460px,78%);height:54%;--ph-r:18px 18px 0 0}
+  .d-art > span{font-size:11px}
+
+  .col .logo--lg{margin-bottom:26px}
+  .col .logo--lg .logo__img{height:40px}
+  .plans{margin:0 0 22px;gap:11px}
+  .plans .plan{width:270px;min-height:54px;font-size:25px}
+  .copy{font-size:clamp(17px,1.35vw,20px);max-width:440px}
+  .btn--cta{width:230px;height:52px;font-size:36px;margin-top:26px}
+  .friend{margin:0 0 20px;max-width:380px}
+
+  .form{padding-top:0}
+  .field{width:320px;margin-bottom:18px}
+  .label{font-size:34px}
+  .input,.select{height:46px}
+
+  /* quiz */
+  .scr-quiz .q-visual{height:auto}
+  .q-coral{inset:0;border-radius:0 0 70px 0}
+  .q-coral .halftone{width:300px;height:190px}
+  .q-cloud{left:12%;top:14%;transform:none;width:62%;height:40%;--ph-r:120px}
+  .q-cloud-2{display:grid;position:absolute;left:30%;bottom:8%;width:48%;height:26%;--ph-r:90px}
+  .q-cloud > span,.q-cloud-2 > span{font-size:11px}
+  .quiz-main{position:relative;justify-content:center}
+  .quiz-main .q-tab{position:absolute;top:0;left:0;border-radius:0 0 34px 0;font-size:56px;padding:12px 34px 8px 24px}
+  .q-text{font-size:clamp(30px,2.7vw,40px);max-width:560px;padding:0 40px 26px}
+  .opts{gap:13px}
+  .opt{width:420px;min-height:58px;font-size:18px}
+  .quiz-main .logo{position:absolute;right:40px;bottom:30px}
+
+  /* result */
+  .scr-res.is-active{grid-template-areas:"write chart" "write actions";grid-template-rows:1fr auto}
+  .slides{display:contents}
+  .slide--stats{display:none}
+  .slide--write{grid-area:write;justify-content:flex-start;padding:0 0 30px;overflow:hidden}
+  .slide--write .hero{width:min(440px,78%);border-radius:0 0 38px 38px;padding:30px 20px 30px}
+  .hero .art{width:210px;height:168px}
+  .hero .big{font-size:clamp(76px,6.4vw,104px)}
+  .hero .eyebrow{font-size:20px}
+  .start{font-size:24px;margin-top:26px}
+  .write{font-size:19px;max-width:470px}
+  .slide--write .logo--lg{margin-top:auto}
+  .slide--chart{grid-area:chart;justify-content:center;padding-top:40px}
+  .intro{font-size:20px;padding:0}
+  .art--sm{width:190px;height:150px}
+  .ctitle{font-size:44px}
+  .rows{width:480px;padding:0}
+  .res-actions{grid-area:actions;flex-direction:row;justify-content:center;align-items:flex-end;gap:36px;padding:10px 0 48px}
+  .share{align-items:flex-start}
+  .btn--learn{margin:0;width:210px;height:44px;font-size:28px}
+  .retake{position:absolute;right:28px;bottom:18px;margin:0}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="mylegacy-logo" viewBox="0 0 305 40"><path d="M40.474 20.8741L21.7677 3.42309C20.7319 2.45889 19.1567 2.46844 18.245 3.45173L4.05889 18.6593C3.1472 19.6378 3.24266 21.213 4.27846 22.1772L22.4455 39.0793C23.7772 40.3203 25.8154 40.306 26.9944 39.0459L40.6984 24.3968C41.6101 23.4182 41.5098 21.8431 40.474 20.8789V20.8741ZM10.9897 23.7858C10.9228 23.8478 10.8226 23.8478 10.7605 23.7858L7.96341 21.1653C7.90136 21.0984 7.90136 20.9982 7.96341 20.9314L10.4741 18.2536C10.541 18.1915 10.6412 18.1915 10.7033 18.2536L13.5004 20.8693C13.5624 20.9361 13.5624 21.0364 13.5004 21.1032L10.9897 23.7858ZM14.8751 27.5519L13.5911 26.3442C13.4861 26.244 13.4765 26.0769 13.5768 25.9672L22.1066 16.8598C22.2068 16.7548 22.3739 16.7452 22.4836 16.8455L23.7676 18.0483C23.8727 18.1486 23.8822 18.3156 23.782 18.4254L15.2426 27.5328C15.1424 27.6378 14.9801 27.6426 14.8751 27.5471V27.5519ZM23.9156 25.3514L18.7748 30.8406C18.6746 30.9457 18.5075 30.9552 18.3977 30.855L17.1137 29.6521C17.0087 29.5519 16.9992 29.3848 17.0994 29.275L22.245 23.7858C22.3452 23.6808 22.5123 23.6712 22.6173 23.7715L23.9061 24.9743C24.0111 25.0746 24.0159 25.2416 23.9156 25.3514Z" style="fill:var(--lg-navy,#24588D)"/><path d="M33.0711 0.00962017C30.5174 0.0907654 28.0974 1.17429 26.3361 3.02154L24.002 5.50841L33.5866 14.4487C32.0306 17.0835 32.4983 20.4487 34.7227 22.5537H34.7322L39.1761 17.8091L40.4983 16.401C44.1737 12.4726 43.9732 6.31031 40.0448 2.63014C38.1594 0.864032 35.6487 -0.0762983 33.0711 0.00484692V0.00962017Z" style="fill:var(--lg-gold,#FFC166)"/><path d="M17.7629 3.95791L16.3261 2.61185C12.3643 -1.02536 6.20204 -0.762836 2.56483 3.19896C-1.01989 7.10348 -0.824183 13.1655 3.00874 16.8266L4.4789 18.2061L13.319 8.72639C15.9442 11.1846 20.0636 11.051 22.5266 8.42567L17.7629 3.95791Z" style="fill:var(--lg-gold,#FFC166)"/><path d="M53.1365 11.7254C53.1365 10.4414 54.1532 9.42469 55.4372 9.42469H55.9432C56.9312 9.42469 57.5852 9.93066 58.0339 10.618L63.5899 19.6681L69.1746 10.5846C69.6519 9.80656 70.3393 9.41992 71.2367 9.41992H71.7426C73.0266 9.41992 74.0433 10.4366 74.0433 11.7206V28.3363C74.0433 29.6203 73.0266 30.637 71.7426 30.637C70.4586 30.637 69.4706 29.6203 69.4706 28.3363V17.9115L65.4372 24.1263C64.9598 24.8423 64.3632 25.291 63.5231 25.291C62.683 25.291 62.0911 24.8423 61.609 24.1263L57.6377 18.0022V28.3984C57.6377 29.6824 56.6496 30.637 55.3656 30.637C54.0816 30.637 53.127 29.6824 53.127 28.3984V11.7254H53.1365Z" style="fill:var(--lg-navy,#24588D)"/><path d="M83.9296 22.3897L77.1754 13.2155C76.8461 12.7668 76.6074 12.2609 76.6074 11.5735C76.6074 10.3468 77.6241 9.36349 78.9081 9.36349C79.9535 9.36349 80.6122 9.93151 81.1802 10.7668L86.2589 18.0842L91.4284 10.7048C91.9964 9.86946 92.6837 9.33008 93.6384 9.33008C95.0417 9.33008 95.877 10.2847 95.877 11.5687C95.877 12.194 95.6097 12.7334 95.2804 13.1821L88.5262 22.2942V28.3276C88.5262 29.6116 87.5095 30.6283 86.2255 30.6283C84.9415 30.6283 83.9248 29.6116 83.9248 28.3276V22.3801L83.9296 22.3897Z" style="fill:var(--lg-navy,#24588D)"/><path d="M104.812 11.664C104.812 10.38 105.829 9.36328 107.113 9.36328C108.397 9.36328 109.414 10.38 109.414 11.664V26.2749H117.929C119.094 26.2749 120.02 27.2009 120.02 28.3656C120.02 29.5303 119.094 30.4563 117.929 30.4563H107.113C105.829 30.4563 104.812 29.4396 104.812 28.1556V11.664Z" style="fill:var(--lg-navy,#24588D)"/><path d="M125.457 30.4565C124.173 30.4565 123.156 29.4398 123.156 28.1558V11.8456C123.156 10.5616 124.173 9.54492 125.457 9.54492H137.051C138.216 9.54492 139.113 10.4423 139.113 11.607C139.113 12.7716 138.216 13.6404 137.051 13.6404H127.729V17.8838H135.705C136.87 17.8838 137.767 18.7812 137.767 19.9458C137.767 21.1105 136.87 21.9792 135.705 21.9792H127.729V26.3706H137.199C138.364 26.3706 139.261 27.268 139.261 28.4327C139.261 29.5973 138.364 30.4661 137.199 30.4661H125.457V30.4565Z" style="fill:var(--lg-navy,#24588D)"/><path d="M141.412 20.0599V19.9978C141.412 14.0504 146.042 9.18164 152.376 9.18164C155.574 9.18164 157.603 9.89763 159.517 11.215C159.966 11.5444 160.472 12.1411 160.472 13.0671C160.472 14.3511 159.484 15.3391 158.2 15.3391C157.512 15.3391 157.126 15.1005 156.796 14.8618C155.512 13.9358 154.228 13.4298 152.224 13.4298C148.877 13.4298 146.219 16.3892 146.219 19.9453V20.0026C146.219 23.826 148.849 26.6374 152.553 26.6374C154.257 26.6374 155.718 26.2174 156.887 25.3821V22.394H153.78C152.672 22.394 151.78 21.53 151.78 20.4226C151.78 19.3153 152.677 18.4227 153.78 18.4227H159.04C160.324 18.4227 161.34 19.4394 161.34 20.7234V25.8021C161.34 27.1147 160.801 28.1028 159.727 28.7281C158.023 29.7734 155.546 30.8188 152.41 30.8188C145.899 30.8188 141.417 26.2794 141.417 20.0647L141.412 20.0599Z" style="fill:var(--lg-navy,#24588D)"/><path d="M164.421 27.5012L171.709 11.0382C172.215 9.87355 173.113 9.21484 174.397 9.21484H174.664C175.948 9.21484 176.817 9.87355 177.323 11.0382L184.611 27.5012C184.759 27.8592 184.85 28.1599 184.85 28.4272C184.85 29.6539 183.895 30.6372 182.669 30.6372C181.595 30.6372 180.907 30.0119 180.459 29.0525L179.055 25.7685H169.852L168.387 29.2052C168 30.1312 167.222 30.6372 166.268 30.6372C165.074 30.6372 164.148 29.6825 164.148 28.4845C164.148 28.1551 164.268 27.8257 164.416 27.4964L164.421 27.5012ZM177.356 21.7064L174.459 14.8043L171.561 21.7064H177.356Z" style="fill:var(--lg-navy,#24588D)"/><path d="M185.928 20.0599V19.9978C185.928 14.0504 190.41 9.18164 196.835 9.18164C199.971 9.18164 202.061 10.017 203.827 11.301C204.305 11.659 204.725 12.3177 204.725 13.1243C204.725 14.4084 203.737 15.363 202.453 15.363C201.827 15.363 201.407 15.1243 201.078 14.9143C199.794 13.9597 198.477 13.4203 196.806 13.4203C193.279 13.4203 190.739 16.3463 190.739 19.9358V19.9931C190.739 23.5778 193.221 26.5658 196.806 26.5658C198.749 26.5658 200.033 25.9692 201.345 24.9238C201.732 24.5945 202.214 24.4179 202.72 24.4179C203.885 24.4179 204.873 25.3725 204.873 26.5372C204.873 27.2532 204.543 27.8212 204.095 28.1792C202.214 29.8212 199.999 30.8092 196.658 30.8092C190.505 30.8092 185.933 26.0599 185.933 20.0551L185.928 20.0599Z" style="fill:var(--lg-navy,#24588D)"/><path d="M214.172 22.3897L207.418 13.2155C207.088 12.7668 206.85 12.2609 206.85 11.5735C206.85 10.3468 207.866 9.36349 209.15 9.36349C210.196 9.36349 210.854 9.93151 211.422 10.7668L216.501 18.0842L221.671 10.7048C222.239 9.86946 222.926 9.33008 223.881 9.33008C225.284 9.33008 226.119 10.2847 226.119 11.5687C226.119 12.194 225.852 12.7334 225.523 13.1821L218.768 22.2942V28.3276C218.768 29.6116 217.752 30.6283 216.468 30.6283C215.184 30.6283 214.167 29.6116 214.167 28.3276V22.3801L214.172 22.3897Z" style="fill:var(--lg-navy,#24588D)"/><path d="M245.709 18.6266C245.709 17.8104 246.353 17.166 247.17 17.166C247.986 17.166 248.63 17.8104 248.63 18.6266V27.8963H254.034C254.773 27.8963 255.361 28.4834 255.361 29.2232C255.361 29.9631 254.773 30.5502 254.034 30.5502H247.174C246.358 30.5502 245.714 29.9058 245.714 29.0896V18.6266H245.709Z" style="fill:var(--lg-gray,#414042)"/><path d="M262.601 22.7896H262.486C261.823 22.7896 261.293 22.2789 261.293 21.6154C261.293 20.9519 261.823 20.4221 262.486 20.4221H262.601V19.7777C262.601 18.6608 262.887 17.8445 263.417 17.3147C263.947 16.7849 264.725 16.5176 265.746 16.5176C266.2 16.5176 266.601 16.5367 266.921 16.594C267.412 16.6703 267.904 17.1047 267.904 17.7491C267.904 18.3935 267.374 18.9424 266.73 18.9424H266.481C265.818 18.9424 265.441 19.2813 265.441 20.0402V20.4364H266.692C267.355 20.4364 267.885 20.9472 267.885 21.6106C267.885 22.2741 267.355 22.7849 266.692 22.7849H265.479V29.1524C265.479 29.9495 264.835 30.5939 264.038 30.5939C263.24 30.5939 262.596 29.9495 262.596 29.1524V22.7849L262.601 22.7896Z" style="fill:var(--lg-gray,#414042)"/><path d="M275.694 24.6082C275.522 23.3194 274.763 22.4459 273.551 22.4459C272.338 22.4459 271.579 23.3003 271.35 24.6082H275.689H275.694ZM273.837 30.7084C270.787 30.7084 268.529 28.5652 268.529 25.4578V25.4196C268.529 22.5223 270.596 20.1309 273.551 20.1309C276.945 20.1309 278.439 22.9184 278.439 25.0187C278.439 25.854 277.851 26.4029 277.093 26.4029H271.388C271.675 27.7108 272.582 28.3934 273.871 28.3934C274.668 28.3934 275.331 28.1451 275.918 27.7108C276.128 27.558 276.314 27.4817 276.62 27.4817C277.264 27.4817 277.737 27.9733 277.737 28.6177C277.737 28.9948 277.565 29.2812 277.36 29.4721C276.467 30.2311 275.312 30.7036 273.832 30.7036" style="fill:var(--lg-gray,#414042)"/><path d="M259.766 21.5589C259.718 20.8048 259.093 20.2129 258.329 20.2129C257.566 20.2129 256.94 20.8095 256.893 21.5589C256.893 21.5924 256.893 21.621 256.893 21.6544V25.5637V29.158C256.893 29.3012 256.912 29.4396 256.955 29.5685C257.103 30.0744 257.523 30.4611 258.043 30.5708C258.138 30.5899 258.234 30.5995 258.334 30.5995C258.434 30.5995 258.53 30.5899 258.625 30.5708C259.146 30.4658 259.566 30.0744 259.714 29.5685C259.752 29.4396 259.776 29.3012 259.776 29.158V25.5637V21.6544C259.776 21.621 259.776 21.5924 259.776 21.5589" style="fill:var(--lg-gray,#414042)"/><path d="M259.896 17.5532C259.729 16.9279 259.108 16.5508 258.33 16.5508C257.552 16.5508 256.932 16.9231 256.765 17.5532C256.736 17.6629 256.717 17.7775 256.717 17.8968V17.935C256.717 18.7703 257.418 19.3002 258.325 19.3002C259.232 19.3002 259.939 18.7703 259.939 17.935V17.8968C259.939 17.7727 259.92 17.6582 259.891 17.5532" style="fill:var(--lg-gray,#414042)"/><path d="M280.357 29.0237C280.023 28.7898 279.789 28.3602 279.789 27.8877C279.789 27.1049 280.414 26.4987 281.197 26.4987C281.589 26.4987 281.861 26.6371 282.056 26.7708C283.092 27.5345 284.228 28.0022 285.56 28.0022C286.791 28.0022 287.536 27.5106 287.536 26.7087V26.6705C287.536 25.9068 287.068 25.5154 284.777 24.9283C282.018 24.2218 280.233 23.4581 280.233 20.7374V20.6992C280.233 18.2123 282.228 16.5703 285.03 16.5703C286.696 16.5703 288.142 16.9999 289.374 17.7827C289.708 17.9784 290.037 18.3889 290.037 18.976C290.037 19.7588 289.412 20.365 288.629 20.365C288.333 20.365 288.099 20.2887 287.865 20.1503C286.868 19.5631 285.927 19.229 284.987 19.229C283.832 19.229 283.226 19.7588 283.226 20.4223V20.4605C283.226 21.3627 283.813 21.6538 286.18 22.26C288.958 22.9856 290.529 23.9832 290.529 26.3698V26.408C290.529 29.1287 288.453 30.6562 285.498 30.6562C283.698 30.6562 281.875 30.1073 280.348 29.0094" style="fill:var(--lg-red,#EF413D)"/><path d="M291.924 23.6577V23.6195C291.924 19.7246 294.96 16.5312 299.108 16.5312C301.184 16.5312 302.554 16.999 303.785 17.863C304.081 18.0778 304.411 18.4883 304.411 19.0754C304.411 19.8964 303.747 20.5646 302.921 20.5646C302.492 20.5646 302.215 20.4071 302 20.2496C301.179 19.6625 300.296 19.3093 299.007 19.3093C296.816 19.3093 295.074 21.2472 295.074 23.5766V23.6148C295.074 26.1207 296.797 27.9584 299.222 27.9584C300.32 27.9584 301.298 27.6863 302.062 27.1374V25.1804H300.024C299.299 25.1804 298.711 24.6124 298.711 23.8868C298.711 23.1613 299.299 22.5742 300.024 22.5742H303.47C304.31 22.5742 304.979 23.2377 304.979 24.0825V27.4095C304.979 28.2925 304.645 28.8987 303.924 29.3283C302.807 30.0157 301.184 30.6983 299.127 30.6983C294.859 30.6983 291.924 27.7054 291.924 23.6529" style="fill:var(--lg-red,#EF413D)"/><path d="M241.9 23.7637C241.809 20.0406 238.754 17.043 235.012 17.043C231.269 17.043 228.119 20.136 228.119 23.9308C228.119 27.7255 231.212 30.8186 235.012 30.8186C235.37 30.8186 235.656 30.5274 235.656 30.1742C235.656 29.821 235.37 29.5298 235.012 29.5298C231.923 29.5298 229.413 27.0191 229.413 23.9308C229.413 20.8425 231.923 18.3317 235.012 18.3317C238.1 18.3317 240.611 20.8425 240.611 23.9308V24.747C240.611 25.42 240.095 25.9689 239.465 25.9689C238.835 25.9689 238.32 25.42 238.32 24.747V21.2721C238.32 20.9141 238.028 20.6277 237.675 20.6277C237.322 20.6277 237.031 20.9188 237.031 21.2721V21.3198C236.472 20.8854 235.775 20.6277 235.016 20.6277C233.193 20.6277 231.709 22.1122 231.709 23.9355C231.709 25.7589 233.193 27.2434 235.016 27.2434C235.981 27.2434 236.849 26.8234 237.456 26.1647C237.895 26.8281 238.635 27.2673 239.47 27.2673C240.811 27.2673 241.904 26.1408 241.904 24.7518V23.821C241.904 23.821 241.904 23.7876 241.904 23.7685L241.9 23.7637ZM235.012 25.9499C233.9 25.9499 232.997 25.0429 232.997 23.9355C232.997 22.8281 233.904 21.9212 235.012 21.9212C236.119 21.9212 237.026 22.8281 237.026 23.9355C237.026 25.0429 236.119 25.9499 235.012 25.9499Z" style="fill:var(--lg-gray,#414042)"/></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13.5a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1.4 1.4M14 10.5a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1.4-1.4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+  <symbol id="i-tt" viewBox="0 0 24 24"><path d="M14 3.5v11a3.6 3.6 0 1 1-3.6-3.6M14 3.5c.6 2.6 2.4 4.1 5 4.3" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-ig" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="5" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12" r="3.9" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="17.2" cy="6.8" r="1.2" fill="currentColor"/></symbol>
+  <symbol id="i-dl" viewBox="0 0 24 24"><path d="M12 3.5v11M7.3 10l4.7 4.7 4.7-4.7M4.5 16.5v3h15v-3" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+
+<div class="app">
+
+  <!-- ================= 1. INSTRUCTIONS ================= -->
+  <section class="screen scr-ins is-active" id="s-ins" aria-labelledby="h-ins">
+    <div class="side">
+      <header class="blk blk--black">
+        <h1 id="h-ins" tabindex="-1" data-focus>INSTRUCTIONS</h1>
+        <p>We recommend 4 legacy plans:</p>
+      </header>
+      <div class="ph ph--coral d-art d-only"><span>ASSET · LION + CORAL STARBURST</span></div>
+    </div>
+    <div class="col col--grow">
+      <a class="logo logo--lg d-only" href="https://mylegacy.life.gov.sg/" target="_blank" rel="noopener"><svg class="logo__img" viewBox="0 0 305 40" role="img" aria-label="MyLegacy @LifeSG"><use href="#mylegacy-logo"/></svg></a>
+      <p class="friend" id="friend" hidden></p>
+      <ul class="plans">
+        <li class="plan plan--lpa">LASTING POWER OF<br>ATTORNEY</li>
+        <li class="plan plan--acp">ADVANCE CARE<br>PLANNING</li>
+        <li class="plan plan--cpf">CPF NOMINATION</li>
+        <li class="plan plan--will">WILL</li>
+      </ul>
+      <p class="copy">And you should make them all,<br>but which one do you start with?</p>
+      <p class="copy">Take this simple questionnaire to receive a recommendation tailored to your response!</p>
+      <button class="btn btn--cta" type="button" data-go="s-pre">CONTINUE</button>
+      <div class="foot m-only">
+        <a class="logo" href="https://mylegacy.life.gov.sg/" target="_blank" rel="noopener"><svg class="logo__img" viewBox="0 0 305 40" role="img" aria-label="MyLegacy @LifeSG"><use href="#mylegacy-logo"/></svg></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 2. PRE-QUIZ ================= -->
+  <section class="screen scr-pre" id="s-pre" aria-labelledby="h-pre">
+    <div class="side">
+      <header class="blk blk--royal">
+        <h1 id="h-pre" tabindex="-1" data-focus>YOUR LEGACY<br>PROFILE</h1>
+        <p>Please input your name and<br>age range (optional)</p>
+      </header>
+      <div class="ph ph--red d-art d-only"><span>ASSET · OWL + RED STARBURST</span></div>
+    </div>
+    <div class="col col--grow">
+      <a class="logo logo--lg d-only" href="https://mylegacy.life.gov.sg/" target="_blank" rel="noopener"><svg class="logo__img" viewBox="0 0 305 40" role="img" aria-label="MyLegacy @LifeSG"><use href="#mylegacy-logo"/></svg></a>
+      <form class="form" id="profile" novalidate>
+        <div class="field">
+          <label class="label" for="f-name">NAME*</label>
+          <span class="hint">(Max. 10 characters)</span>
+          <input class="input" id="f-name" name="name" type="text" maxlength="10" autocomplete="given-name" required aria-describedby="e-name">
+          <p class="err" id="e-name" hidden></p>
+        </div>
+        <div class="field">
+          <label class="label" for="f-age">AGE RANGE</label>
+          <span class="select">
+            <select id="f-age" name="age">
+              <option value="">Select an option</option>
+              <option>21 – 30</option>
+              <option>31 – 40</option>
+              <option>41 – 50</option>
+              <option>51 – 60</option>
+              <option>61 and above</option>
+            </select>
+          </span>
+        </div>
+        <div class="field">
+          <label class="label" for="f-email">EMAIL</label>
+          <span class="hint">(Optional) We can send a copy of your result</span>
+          <input class="input" id="f-email" name="email" type="email" autocomplete="email" aria-describedby="e-email">
+          <p class="err" id="e-email" hidden></p>
+        </div>
+        <p class="req">* Required Field</p>
+        <button class="btn btn--cta" type="submit">START</button>
+      </form>
+      <div class="foot m-only">
+        <a class="logo" href="https://mylegacy.life.gov.sg/" target="_blank" rel="noopener"><svg class="logo__img" viewBox="0 0 305 40" role="img" aria-label="MyLegacy @LifeSG"><use href="#mylegacy-logo"/></svg></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 3. QUIZ ================= -->
+  <section class="screen scr-quiz" id="s-quiz" aria-labelledby="q-text">
+    <div class="q-visual side">
+      <div class="q-coral">
+        <div class="halftone halftone--tr"></div>
+        <div class="halftone halftone--bl d-only" style="width:260px;height:120px"></div>
+        <svg class="squig" style="left:18%;top:-6px;width:90px;height:50px" viewBox="0 0 90 50" aria-hidden="true"><path d="M2 2c14 8 6 18 20 20s12-12 26-6 8 20 24 24"/></svg>
+        <svg class="squig d-only" style="right:4%;top:52%;width:90px;height:64px" viewBox="0 0 90 64" aria-hidden="true"><path d="M88 2c-12 10-4 18-18 22s-16-6-26 4-6 20-40 34"/></svg>
+        <div class="ph ph--light q-cloud"><span id="q-art-label">ASSET · Q1 VISUAL</span></div>
+        <div class="ph ph--light q-cloud-2"><span>ASSET · SMALL CLOUD "?"</span></div>
+        <i class="deco-dot" style="left:10%;top:52%;width:22px;height:22px"></i>
+        <i class="deco-dot" style="left:6%;top:64%;width:9px;height:9px"></i>
+        <i class="deco-ring" style="right:24%;top:54%;width:10px;height:10px"></i>
+        <i class="deco-spark" style="right:10%;top:57%"></i>
+      </div>
+      <div class="q-tab m-only js-qnum">1 OF 5</div>
+    </div>
+    <div class="col col--grow quiz-main">
+      <div class="q-tab d-only js-qnum">1 OF 5</div>
+      <div class="q-body" id="q-body">
+        <h2 class="q-text" id="q-text" tabindex="-1" data-focus></h2>
+        <div class="opts" id="q-opts" role="group" aria-labelledby="q-text"></div>
+        <button class="back" type="button" id="q-back" hidden>Back to previous question</button>
+      </div>
+      <div class="foot m-only">
+        <span class="logo"><svg class="logo__img" viewBox="0 0 305 40" role="img" aria-label="MyLegacy @LifeSG"><use href="#mylegacy-logo"/></svg></span>
+      </div>
+      <span class="logo logo--lg d-only"><svg class="logo__img" viewBox="0 0 305 40" role="img" aria-label="MyLegacy @LifeSG"><use href="#mylegacy-logo"/></svg></span>
+    </div>
+  </section>
+
+  <!-- ================= 4. RESULT ================= -->
+  <section class="screen scr-res" id="s-res" aria-labelledby="r-big-write">
+    <div class="slides" id="slides" aria-roledescription="carousel">
+      <article class="slide slide--stats" aria-label="Your result">
+        <p class="eyebrow js-eyebrow">YOU GOT THE</p>
+        <h1 class="big js-big" tabindex="-1" data-focus-m>PRACTICAL<br>SQUIRREL</h1>
+        <p class="tag js-tag"></p>
+        <div class="ph ph--accent art"><span class="js-art">ASSET · SQUIRREL ON SCALLOP</span></div>
+        <p class="stat-line js-statline"></p>
+      </article>
+
+      <article class="slide slide--chart" aria-label="How you compare">
+        <p class="intro">See how you compare to<br class="m-only"> the rest of the respondents:</p>
+        <div class="ph ph--accent art art--sm"><span class="js-art">ASSET · SQUIRREL</span></div>
+        <p class="ctitle js-plural">PRACTICAL SQUIRRELS</p>
+        <div class="me-bar"><b class="js-pct">10%</b><span>of Singaporeans</span></div>
+        <div class="rows" id="rows"></div>
+      </article>
+
+      <article class="slide slide--write" aria-label="Your first step">
+        <div class="hero">
+          <div class="ph ph--light art"><span class="js-art">ASSET · SQUIRREL ON CREAM SCALLOP</span></div>
+          <p class="eyebrow js-eyebrow">YOU GOT THE</p>
+          <h1 class="big js-big" id="r-big-write" tabindex="-1" data-focus>PRACTICAL<br>SQUIRREL</h1>
+        </div>
+        <p class="start js-start"></p>
+        <p class="write js-write"></p>
+        <span class="logo logo--lg d-only"><svg class="logo__img" viewBox="0 0 305 40" role="img" aria-label="MyLegacy @LifeSG"><use href="#mylegacy-logo"/></svg></span>
+      </article>
+    </div>
+
+    <div class="res-actions">
+      <div class="dots m-only" id="dots" role="tablist" aria-label="Result slides">
+        <button type="button" role="tab" aria-label="Slide 1: Your result" aria-current="true"></button>
+        <button type="button" role="tab" aria-label="Slide 2: How you compare"></button>
+        <button type="button" role="tab" aria-label="Slide 3: Your first step"></button>
+      </div>
+      <div class="share">
+        <p class="share__t">Share your result!</p>
+        <div class="share__row">
+          <button class="icon-btn" type="button" data-share="link" aria-label="Copy link"><svg aria-hidden="true"><use href="#i-link"/></svg></button>
+          <button class="icon-btn" type="button" data-share="TikTok" aria-label="Share to TikTok"><svg aria-hidden="true"><use href="#i-tt"/></svg></button>
+          <button class="icon-btn" type="button" data-share="Instagram" aria-label="Share to Instagram"><svg aria-hidden="true"><use href="#i-ig"/></svg></button>
+          <button class="icon-btn" type="button" data-share="download" aria-label="Download result image"><svg aria-hidden="true"><use href="#i-dl"/></svg></button>
+        </div>
+      </div>
+      <a class="btn btn--learn js-learn" href="https://mylegacy.life.gov.sg/" target="_blank" rel="noopener">LEARN MORE</a>
+      <span class="logo m-only"><svg class="logo__img" viewBox="0 0 305 40" role="img" aria-label="MyLegacy @LifeSG"><use href="#mylegacy-logo"/></svg></span>
+      <button class="retake" type="button" id="retake">Retake the quiz</button>
+    </div>
+  </section>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- ================= RESPONSES PANEL (open with ?admin, Ctrl/Cmd+Shift+E, or tap "INSTRUCTIONS" 5 times) ================= -->
+  <dialog class="admin" id="admin" aria-labelledby="admin-title">
+    <div class="admin__head">
+      <div>
+        <h2 id="admin-title">QUIZ RESPONSES</h2>
+        <p>Saved in this browser on this device.</p>
+      </div>
+      <button class="admin__x" type="button" id="admin-close" aria-label="Close responses panel">✕</button>
+    </div>
+    <div class="admin__body">
+      <div class="admin__stats">
+        <div class="admin__total"><b id="admin-total">0</b><span>completed</span></div>
+        <div class="admin__bars" id="admin-bars"></div>
+      </div>
+      <p class="admin__lbl">Latest responses</p>
+      <ul class="admin__list" id="admin-list"></ul>
+      <p class="admin__note" id="admin-note">The Excel file has two sheets: <b>Responses</b> (one row per quiz, with every answer) and <b>Summary</b> (totals per result).</p>
+      <div class="admin__actions">
+        <button class="btn" type="button" id="admin-xlsx">DOWNLOAD EXCEL</button>
+        <button class="btn btn--outline" type="button" id="admin-clear">CLEAR ALL</button>
+      </div>
+    </div>
+  </dialog>
+</div>
+
+<script>
+(() => {
+  /* ---------- Content ---------- */
+  const PERSONAS = {
+    lion: {
+      name: "Protective Lion", plural: "Protective Lions", color: "#F2875A", pct: 30, animal: "LION",
+      plan: "Lasting Power of Attorney",
+      tag: "You believe in protecting loved ones while staying in control.",
+      start: "Start with a Lasting Power of Attorney!",
+      write: "Appoint someone you trust to make decisions on your personal welfare and property, in case you ever lose mental capacity.",
+      img: null
+    },
+    owl: {
+      name: "Wise Owl", plural: "Wise Owls", color: "#A8272B", pct: 20, animal: "OWL",
+      plan: "Will",
+      tag: "You think long-term and like things settled clearly.",
+      start: "Start with your Will!",
+      write: "Spell out how your assets should be shared, so your loved ones never have to guess or argue about what you wanted.",
+      img: null
+    },
+    dolphin: {
+      name: "Caring Dolphin", plural: "Caring Dolphins", color: "#3A4A63", pct: 40, animal: "DOLPHIN",
+      plan: "Advance Care Planning",
+      tag: "You prioritise family harmony and open communication.",
+      start: "Start with Advance Care Planning!",
+      write: "Document your healthcare preferences for your family, while encouraging similar discussions with ageing parents.",
+      img: null
+    },
+    squirrel: {
+      name: "Practical Squirrel", plural: "Practical Squirrels", color: "#1877F2", pct: 10, animal: "SQUIRREL",
+      plan: "CPF Nomination",
+      tag: "You appreciate efficient, straightforward solutions.",
+      start: "Start with CPF Nomination!",
+      write: "As your CPF savings grow, make sure your nomination reflects your current family situation and priorities.",
+      img: null
+    }
+  };
+
+  const QUESTIONS = [
+    { q: "When thinking about your future, you're most concerned about...", o: [
+      { t: "Making sure everything is properly sorted out for your loved ones", p: "owl" },
+      { t: "Maintaining independence in decision-making", p: "lion" },
+      { t: "Your family's wellbeing and happiness", p: "dolphin" },
+      { t: "Ensuring your savings reach the right people efficiently", p: "squirrel" }
+    ]},
+    { q: "If you suddenly couldn't make decisions for yourself, what would worry you most?", o: [
+      { t: "Nobody being allowed to manage my bank account and bills", p: "lion" },
+      { t: "My family having to guess what medical care I'd want", p: "dolphin" },
+      { t: "My CPF savings going to the wrong person, or taking too long", p: "squirrel" },
+      { t: "My loved ones disagreeing over what happens to my things", p: "owl" }
+    ]},
+    { q: "Your friends would most likely describe you as...", o: [
+      { t: "The planner with a spreadsheet for everything", p: "squirrel" },
+      { t: "The one who keeps everyone together", p: "dolphin" },
+      { t: "The decisive one who takes charge", p: "lion" },
+      { t: "The thoughtful one who thinks ten steps ahead", p: "owl" }
+    ]},
+    { q: "Which conversation have you been putting off the longest?", o: [
+      { t: "Talking about the care I'd want near the end of life", p: "dolphin" },
+      { t: "Deciding who gets my home and belongings", p: "owl" },
+      { t: "Choosing someone I trust to act on my behalf", p: "lion" },
+      { t: "Checking who will receive my CPF savings", p: "squirrel" }
+    ]},
+    { q: "To you, leaving a legacy means...", o: [
+      { t: "Peace of mind for the people I leave behind", p: "owl" },
+      { t: "Staying in control of my life, even when I can't speak up", p: "lion" },
+      { t: "Making every dollar count for the people I love", p: "squirrel" },
+      { t: "My wishes respected and my family at peace", p: "dolphin" }
+    ]}
+  ];
+
+  const LEARN_URL = "https://mylegacy.life.gov.sg/";
+  const SHARE_DOMAIN = "planyourlegacy.gov.sg";
+
+  /* ---------- State ---------- */
+  const state = { name: "", age: "", email: "", answers: [], answerTexts: [], result: null };
+  let qi = 0;
+  let locked = false;
+
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const isDesktop = () => matchMedia("(min-width:900px)").matches;
+
+  /* ---------- Navigation ---------- */
+  function go(id) {
+    $$(".screen").forEach(s => s.classList.toggle("is-active", s.id === id));
+    window.scrollTo(0, 0);
+    const scr = $("#" + id);
+    const target = (!isDesktop() && $("[data-focus-m]", scr)) || $("[data-focus]", scr);
+    if (target) target.focus({ preventScroll: true });
+  }
+  $$("[data-go]").forEach(b => b.addEventListener("click", () => go(b.dataset.go)));
+
+  /* ---------- Friend banner (shared link ?r=key) ---------- */
+  const sharedKey = new URLSearchParams(location.search).get("r");
+  if (PERSONAS[sharedKey]) {
+    const f = $("#friend");
+    f.style.setProperty("--friend-c", PERSONAS[sharedKey].color);
+    f.innerHTML = `A friend got the <b>${PERSONAS[sharedKey].name}</b>. Which one are you?`;
+    f.hidden = false;
+  }
+
+  /* ---------- Profile form ---------- */
+  const form = $("#profile");
+  function setErr(input, errEl, msg) {
+    input.classList.toggle("is-invalid", !!msg);
+    input.setAttribute("aria-invalid", msg ? "true" : "false");
+    errEl.textContent = msg || "";
+    errEl.hidden = !msg;
+  }
+  form.addEventListener("submit", e => {
+    e.preventDefault();
+    const nameEl = $("#f-name"), emailEl = $("#f-email");
+    const name = nameEl.value.trim();
+    const email = emailEl.value.trim();
+    let ok = true;
+
+    if (!name) { setErr(nameEl, $("#e-name"), "Enter your name to continue."); ok = false; }
+    else setErr(nameEl, $("#e-name"), "");
+
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+      setErr(emailEl, $("#e-email"), "Check your email address, e.g. name@email.com");
+      ok = false;
+    } else setErr(emailEl, $("#e-email"), "");
+
+    if (!ok) { (name ? emailEl : nameEl).focus(); return; }
+
+    state.name = name;
+    state.age = $("#f-age").value;
+    state.email = email;
+    state.answers = [];
+    state.answerTexts = [];
+    qi = 0;
+    renderQuestion(false);
+    go("s-quiz");
+  });
+  $("#f-name").addEventListener("input", e => { if (e.target.value.trim()) setErr(e.target, $("#e-name"), ""); });
+
+  /* ---------- Quiz ---------- */
+  function renderQuestion(animate = true) {
+    const q = QUESTIONS[qi];
+    $$(".js-qnum").forEach(el => el.textContent = `${qi + 1} OF ${QUESTIONS.length}`);
+    $("#q-art-label").textContent = `ASSET · Q${qi + 1} VISUAL`;
+    $("#q-text").textContent = q.q;
+    $("#q-opts").innerHTML = q.o.map((o, i) =>
+      `<button class="opt" type="button" data-p="${o.p}">${"ABCD"[i]}. ${o.t}</button>`
+    ).join("");
+    $("#q-back").hidden = qi === 0;
+    if (animate) {
+      const body = $("#q-body");
+      body.classList.remove("is-swap"); void body.offsetWidth; body.classList.add("is-swap");
+      $("#q-text").focus({ preventScroll: true });
+    }
+  }
+
+  $("#q-opts").addEventListener("click", e => {
+    const btn = e.target.closest(".opt");
+    if (!btn || locked) return;
+    locked = true;
+    btn.classList.add("is-picked");
+    $$(".opt", $("#q-opts")).forEach(b => b.disabled = true);
+    state.answers[qi] = btn.dataset.p;
+    state.answerTexts[qi] = btn.textContent.trim();
+    setTimeout(() => {
+      locked = false;
+      if (qi < QUESTIONS.length - 1) { qi++; renderQuestion(); }
+      else finish();
+    }, 380);
+  });
+
+  $("#q-back").addEventListener("click", () => {
+    if (qi === 0) return;
+    qi--;
+    renderQuestion();
+  });
+
+  function score(answers) {
+    const tally = {};
+    answers.forEach(p => tally[p] = (tally[p] || 0) + 1);
+    const max = Math.max(...Object.values(tally));
+    for (let i = answers.length - 1; i >= 0; i--) {
+      if (tally[answers[i]] === max) return answers[i];
+    }
+  }
+
+  /* ---------- Local response store (this browser only) ---------- */
+  const STORE_KEY = "mylegacy.design1.responses.v1";
+  let memoryStore = [];
+  let storageOk = true;
+
+  function loadResponses() {
+    try {
+      const raw = localStorage.getItem(STORE_KEY);
+      const list = raw ? JSON.parse(raw) : [];
+      return Array.isArray(list) ? list : [];
+    } catch (_) {
+      storageOk = false;
+      return memoryStore.slice();
+    }
+  }
+
+  function saveResponses(list) {
+    memoryStore = list.slice();
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify(list));
+      storageOk = true;
+      return true;
+    } catch (_) {
+      storageOk = false;
+      return false;
+    }
+  }
+
+  function makeId() {
+    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+  }
+
+  function submitResponse(payload) {
+    const list = loadResponses();
+    list.push({ id: makeId(), ...payload });
+    if (!saveResponses(list)) console.warn("Browser storage is unavailable. This response is kept until the page is closed.");
+    return Promise.resolve();
+  }
+
+  function finish() {
+    const key = score(state.answers);
+    state.result = key;
+    renderResult(key);
+    submitResponse({
+      name: state.name, age: state.age, email: state.email,
+      answers: state.answers.slice(), answerTexts: state.answerTexts.slice(),
+      result: key, submittedAt: new Date().toISOString()
+    });
+    go("s-res");
+  }
+
+  /* ---------- Result ---------- */
+  function renderResult(key) {
+    const p = PERSONAS[key];
+    const scr = $("#s-res");
+    scr.style.setProperty("--accent", p.color);
+
+    const firstName = state.name.toUpperCase();
+    $$(".js-eyebrow", scr).forEach(el => el.textContent = `${firstName}, YOU GOT THE`);
+    $$(".js-big", scr).forEach(el => el.innerHTML = p.name.toUpperCase().replace(" ", "<br>"));
+    $$(".js-art", scr).forEach(el => el.textContent = `ASSET · ${p.animal}`);
+    $(".js-tag", scr).textContent = p.tag;
+    $(".js-statline", scr).textContent = `You are part of the ${p.pct}% in Singapore who are ${p.plural}!`;
+    $(".js-plural", scr).textContent = p.plural.toUpperCase();
+    $(".js-pct", scr).textContent = `${p.pct}%`;
+    $(".js-start", scr).textContent = p.start;
+    $(".js-write", scr).textContent = p.write;
+
+    const maxPct = Math.max(...Object.values(PERSONAS).map(x => x.pct));
+    $("#rows").innerHTML = Object.entries(PERSONAS)
+      .filter(([k]) => k !== key)
+      .map(([, x]) => `
+        <div class="row" style="--c:${x.color}">
+          <div class="ph" style="--ph-bg:${x.color}55"><span>${x.animal}</span></div>
+          <div class="row__body">
+            <span class="row__lbl">${x.plural.toUpperCase()}</span>
+            <div class="row__bar" style="width:${Math.max(18, (x.pct / maxPct) * 100)}%">${x.pct}%</div>
+          </div>
+        </div>`).join("");
+
+    const slides = $("#slides");
+    slides.scrollLeft = 0;
+    setDot(0);
+  }
+
+  /* carousel dots */
+  const slides = $("#slides");
+  const dots = $$("#dots button");
+  function setDot(i) { dots.forEach((d, j) => d.setAttribute("aria-current", j === i ? "true" : "false")); }
+  slides.addEventListener("scroll", () => {
+    if (isDesktop()) return;
+    setDot(Math.round(slides.scrollLeft / slides.clientWidth));
+  }, { passive: true });
+  dots.forEach((d, i) => d.addEventListener("click", () => {
+    slides.scrollTo({ left: i * slides.clientWidth, behavior: "smooth" });
+  }));
+
+  $("#retake").addEventListener("click", () => {
+    state.answers = []; state.answerTexts = []; state.result = null; qi = 0;
+    go("s-ins");
+  });
+
+  /* ---------- Excel (.xlsx) writer, no libraries ---------- */
+  const CRC_TABLE = (() => {
+    const t = new Uint32Array(256);
+    for (let n = 0; n < 256; n++) {
+      let c = n;
+      for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1;
+      t[n] = c >>> 0;
+    }
+    return t;
+  })();
+  function crc32(bytes) {
+    let c = 0xFFFFFFFF;
+    for (let i = 0; i < bytes.length; i++) c = CRC_TABLE[(c ^ bytes[i]) & 0xFF] ^ (c >>> 8);
+    return (c ^ 0xFFFFFFFF) >>> 0;
+  }
+
+  function zipStore(files) {
+    const enc = new TextEncoder();
+    const now = new Date();
+    const dosTime = (now.getHours() << 11) | (now.getMinutes() << 5) | Math.floor(now.getSeconds() / 2);
+    const dosDate = ((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate();
+    const chunks = [], central = [];
+    let offset = 0;
+
+    for (const f of files) {
+      const name = enc.encode(f.name);
+      const data = typeof f.data === "string" ? enc.encode(f.data) : f.data;
+      const crc = crc32(data);
+
+      const local = new DataView(new ArrayBuffer(30));
+      local.setUint32(0, 0x04034b50, true);
+      local.setUint16(4, 20, true);
+      local.setUint16(6, 0x0800, true);
+      local.setUint16(8, 0, true);
+      local.setUint16(10, dosTime, true);
+      local.setUint16(12, dosDate, true);
+      local.setUint32(14, crc, true);
+      local.setUint32(18, data.length, true);
+      local.setUint32(22, data.length, true);
+      local.setUint16(26, name.length, true);
+      local.setUint16(28, 0, true);
+      chunks.push(new Uint8Array(local.buffer), name, data);
+
+      const cen = new DataView(new ArrayBuffer(46));
+      cen.setUint32(0, 0x02014b50, true);
+      cen.setUint16(4, 20, true);
+      cen.setUint16(6, 20, true);
+      cen.setUint16(8, 0x0800, true);
+      cen.setUint16(10, 0, true);
+      cen.setUint16(12, dosTime, true);
+      cen.setUint16(14, dosDate, true);
+      cen.setUint32(16, crc, true);
+      cen.setUint32(20, data.length, true);
+      cen.setUint32(24, data.length, true);
+      cen.setUint16(28, name.length, true);
+      cen.setUint32(42, offset, true);
+      central.push(new Uint8Array(cen.buffer), name);
+
+      offset += 30 + name.length + data.length;
+    }
+
+    const cenSize = central.reduce((n, c) => n + c.length, 0);
+    const end = new DataView(new ArrayBuffer(22));
+    end.setUint32(0, 0x06054b50, true);
+    end.setUint16(8, files.length, true);
+    end.setUint16(10, files.length, true);
+    end.setUint32(12, cenSize, true);
+    end.setUint32(16, offset, true);
+
+    return new Blob([...chunks, ...central, new Uint8Array(end.buffer)],
+      { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+  }
+
+  const xmlEsc = v => String(v ?? "")
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, "")
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  const colName = i => { let s = ""; i++; while (i) { const m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = Math.floor((i - 1) / 26); } return s; };
+
+  // cell: string | number | {v, s, t:"n"|"s"}; styles: 0 normal, 1 header, 2 wrap, 3 percent, 4 bold
+  function sheetXml(rows, widths, freezeHeader = true) {
+    const body = rows.map((row, r) => {
+      const cells = row.map((cell, c) => {
+        if (cell === null || cell === undefined || cell === "") return "";
+        const o = typeof cell === "object" ? cell : { v: cell };
+        const ref = colName(c) + (r + 1);
+        const st = o.s ? ` s="${o.s}"` : "";
+        if (typeof o.v === "number" && isFinite(o.v)) return `<c r="${ref}"${st}><v>${o.v}</v></c>`;
+        return `<c r="${ref}"${st} t="inlineStr"><is><t xml:space="preserve">${xmlEsc(o.v)}</t></is></c>`;
+      }).join("");
+      return `<row r="${r + 1}">${cells}</row>`;
+    }).join("");
+    const cols = widths.map((w, i) => `<col min="${i + 1}" max="${i + 1}" width="${w}" customWidth="1"/>`).join("");
+    const pane = freezeHeader
+      ? `<sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>`
+      : `<sheetViews><sheetView workbookViewId="0"/></sheetViews>`;
+    return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">${pane}<sheetFormatPr defaultRowHeight="15"/><cols>${cols}</cols><sheetData>${body}</sheetData></worksheet>`;
+  }
+
+  function buildWorkbook(sheets) {
+    const ct = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/><Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>${sheets.map((_, i) => `<Override PartName="/xl/worksheets/sheet${i + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join("")}</Types>`;
+
+    const rels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/></Relationships>`;
+
+    const wb = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><bookViews><workbookView/></bookViews><sheets>${sheets.map((sh, i) => `<sheet name="${xmlEsc(sh.name)}" sheetId="${i + 1}" r:id="rId${i + 1}"/>`).join("")}</sheets></workbook>`;
+
+    const wbRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${sheets.map((_, i) => `<Relationship Id="rId${i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i + 1}.xml"/>`).join("")}<Relationship Id="rId${sheets.length + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`;
+
+    const styles = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="3"><font><sz val="11"/><name val="Calibri"/><family val="2"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Calibri"/><family val="2"/></font><font><b/><sz val="11"/><name val="Calibri"/><family val="2"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF000000"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="5"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment vertical="center"/></xf><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment wrapText="1" vertical="top"/></xf><xf numFmtId="9" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`;
+
+    const iso = new Date().toISOString().replace(/\.\d+Z$/, "Z");
+    const core = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:title>Plan Your Legacy quiz responses</dc:title><dc:creator>MyLegacy quiz</dc:creator><dcterms:created xsi:type="dcterms:W3CDTF">${iso}</dcterms:created><dcterms:modified xsi:type="dcterms:W3CDTF">${iso}</dcterms:modified></cp:coreProperties>`;
+    const app = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"><Application>Microsoft Excel</Application></Properties>`;
+
+    return zipStore([
+      { name: "[Content_Types].xml", data: ct },
+      { name: "_rels/.rels", data: rels },
+      { name: "docProps/core.xml", data: core },
+      { name: "docProps/app.xml", data: app },
+      { name: "xl/workbook.xml", data: wb },
+      { name: "xl/_rels/workbook.xml.rels", data: wbRels },
+      { name: "xl/styles.xml", data: styles },
+      ...sheets.map((sh, i) => ({ name: `xl/worksheets/sheet${i + 1}.xml`, data: sheetXml(sh.rows, sh.widths, sh.freeze !== false) }))
+    ]);
+  }
+
+  const pad2 = n => String(n).padStart(2, "0");
+  function localStamp(iso) {
+    const d = new Date(iso);
+    if (isNaN(d)) return iso || "";
+    return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
+  }
+
+  function responsesWorkbook(list) {
+    const H = s => ({ v: s, s: 1 });
+    const qCount = Math.max(QUESTIONS.length, ...list.map(r => (r.answers || []).length));
+
+    const head = [H("Submitted"), H("Name"), H("Age range"), H("Email"), H("Result"), H("Recommended plan")];
+    for (let i = 0; i < qCount; i++) head.push(H(`Q${i + 1}`));
+    for (let i = 0; i < qCount; i++) head.push(H(`Q${i + 1} type`));
+
+    const rows = [head, ...list.map(r => {
+      const p = PERSONAS[r.result] || {};
+      const row = [localStamp(r.submittedAt), r.name || "", r.age || "", r.email || "", p.name || r.result || "", p.plan || ""];
+      for (let i = 0; i < qCount; i++) row.push({ v: (r.answerTexts || [])[i] || "", s: 2 });
+      for (let i = 0; i < qCount; i++) row.push((PERSONAS[(r.answers || [])[i]] || {}).name || "");
+      return row;
+    })];
+    const widths = [20, 14, 13, 28, 20, 26, ...Array(qCount).fill(38), ...Array(qCount).fill(18)];
+
+    const total = list.length;
+    const summary = [[H("Result"), H("Recommended plan"), H("Responses"), H("Share")]];
+    Object.values(PERSONAS).forEach((p, i) => {
+      const key = Object.keys(PERSONAS)[i];
+      const n = list.filter(r => r.result === key).length;
+      summary.push([p.name, p.plan, n, { v: total ? n / total : 0, s: 3 }]);
+    });
+    summary.push([{ v: "Total", s: 4 }, "", { v: total, s: 4 }, { v: total ? 1 : 0, s: 3 }]);
+    summary.push([]);
+    summary.push([`Exported ${localStamp(new Date().toISOString())}`]);
+    summary.push(["Responses are saved in the browser on the device that ran the quiz."]);
+
+    return buildWorkbook([
+      { name: "Responses", rows, widths },
+      { name: "Summary", rows: summary, widths: [22, 28, 12, 10], freeze: true }
+    ]);
+  }
+
+  /* ---------- Responses panel ---------- */
+  const admin = $("#admin");
+  const fmtWhen = iso => { const d = new Date(iso); return isNaN(d) ? "" : d.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" }); };
+  const escHtml = v => String(v ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+  function renderAdmin() {
+    const list = loadResponses();
+    const total = list.length;
+    $("#admin-total").textContent = total;
+    $("#admin-bars").innerHTML = Object.entries(PERSONAS).map(([k, p]) => {
+      const n = list.filter(r => r.result === k).length;
+      const pct = total ? Math.round(n / total * 100) : 0;
+      return `<div class="abar" style="--c:${p.color}"><span class="abar__name">${p.name.toUpperCase()}</span><span class="abar__track"><span class="abar__fill" style="display:block;width:${pct}%"></span></span><span class="abar__num">${n}</span></div>`;
+    }).join("");
+    $("#admin-list").innerHTML = total
+      ? list.slice(-5).reverse().map(r => {
+          const p = PERSONAS[r.result] || {};
+          return `<li style="--c:${p.color || "#000"}"><div><b>${escHtml(r.name)}</b><small>${escHtml((p.name || r.result || "").toUpperCase())}</small></div><span>${escHtml(fmtWhen(r.submittedAt))}</span></li>`;
+        }).join("")
+      : `<li class="is-empty">No responses yet. Complete the quiz and it shows up here.</li>`;
+    $("#admin-xlsx").disabled = !total;
+    $("#admin-xlsx").style.opacity = total ? "" : ".4";
+    const note = $("#admin-note");
+    note.classList.toggle("is-warn", !storageOk);
+    note.innerHTML = storageOk
+      ? "The Excel file has two sheets: <b>Responses</b> (one row per quiz, with every answer) and <b>Summary</b> (totals per result). Download before clearing the browser's data."
+      : "<b>This browser is blocking storage</b> (private window or blocked site data), so responses only last until this page is closed. Download the Excel file before closing.";
+  }
+
+  function openAdmin() {
+    renderAdmin();
+    if (admin.open) return;
+    if (typeof admin.showModal === "function") admin.showModal(); else admin.setAttribute("open", "");
+  }
+  function closeAdmin() {
+    if (typeof admin.close === "function") admin.close(); else admin.removeAttribute("open");
+  }
+
+  $("#admin-close").addEventListener("click", closeAdmin);
+  admin.addEventListener("click", e => { if (e.target === admin) closeAdmin(); });
+
+  $("#admin-xlsx").addEventListener("click", () => {
+    const list = loadResponses();
+    if (!list.length) { toast("There are no responses to download yet."); return; }
+    const d = new Date();
+    download(responsesWorkbook(list), `legacy-quiz-responses-${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}.xlsx`);
+    toast(`Excel downloaded with ${list.length} response${list.length === 1 ? "" : "s"}.`);
+  });
+
+  $("#admin-clear").addEventListener("click", () => {
+    const n = loadResponses().length;
+    if (!n) { toast("There are no responses to clear."); return; }
+    if (!confirm(`Delete all ${n} saved responses from this browser? Download the Excel file first if you need them.`)) return;
+    saveResponses([]);
+    renderAdmin();
+    toast("All responses cleared.");
+  });
+
+  document.addEventListener("keydown", e => {
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === "e") { e.preventDefault(); openAdmin(); }
+  });
+
+  let secretTaps = 0, secretTimer;
+  $("#h-ins").addEventListener("click", () => {
+    secretTaps++;
+    clearTimeout(secretTimer);
+    secretTimer = setTimeout(() => { secretTaps = 0; }, 1500);
+    if (secretTaps >= 5) { secretTaps = 0; openAdmin(); }
+  });
+
+  if (new URLSearchParams(location.search).has("admin")) openAdmin();
+
+  /* ---------- Toast ---------- */
+  let toastTimer;
+  function toast(msg) {
+    const t = $("#toast");
+    t.textContent = msg;
+    t.classList.add("is-on");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove("is-on"), 2600);
+  }
+
+  /* ---------- Share image (1080 x 1920 story) ---------- */
+  function wrap(ctx, text, x, y, maxW, lh) {
+    const words = text.split(" ");
+    let line = "";
+    for (const w of words) {
+      const test = line ? line + " " + w : w;
+      if (ctx.measureText(test).width > maxW && line) {
+        ctx.fillText(line, x, y); line = w; y += lh;
+      } else line = test;
+    }
+    ctx.fillText(line, x, y);
+    return y;
+  }
+  function fitFont(ctx, text, weight, size, family, maxW) {
+    do { ctx.font = `${weight} ${size}px ${family}`; size -= 4; }
+    while (ctx.measureText(text).width > maxW && size > 20);
+  }
+  /* ---------- Brand logo for canvas ---------- */
+  function logoImage(white) {
+    const sym = document.getElementById("mylegacy-logo");
+    const vars = white ? "--lg-navy:#fff;--lg-gray:#fff;--lg-red:#fff;" : "";
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1220" height="160" viewBox="0 0 305 40" style="${vars}">${sym.innerHTML}</svg>`;
+    return new Promise((res, rej) => {
+      const i = new Image();
+      i.onload = () => res(i); i.onerror = rej;
+      i.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+    });
+  }
+  async function drawLogo(ctx, cx, y, w, white, align = "center") {
+    try {
+      const img = await logoImage(white);
+      const h = w * 40 / 305;
+      const x = align === "left" ? cx : align === "right" ? cx - w : cx - w / 2;
+      ctx.drawImage(img, x, y, w, h);
+    } catch (_) {}
+  }
+  function loadImg(src) {
+    return new Promise((res, rej) => { const i = new Image(); i.crossOrigin = "anonymous"; i.onload = () => res(i); i.onerror = rej; i.src = src; });
+  }
+
+  async function buildCard() {
+    const p = PERSONAS[state.result];
+    try {
+      await Promise.all([
+        document.fonts.load('400 100px "Bebas Neue"'),
+        document.fonts.load('500 40px "Oswald"'),
+        document.fonts.load('600 40px "Oswald"'),
+        document.fonts.load('800 40px "DM Sans"')
+      ]);
+    } catch (_) {}
+
+    const W = 1080, H = 1920, cx = W / 2;
+    const c = document.createElement("canvas");
+    c.width = W; c.height = H;
+    const ctx = c.getContext("2d");
+
+    ctx.fillStyle = "#FDF1E1"; ctx.fillRect(0, 0, W, H);
+
+    ctx.fillStyle = "rgba(0,0,0,.9)";
+    for (let y = 0; y < 260; y += 18) for (let x = W - 300; x < W; x += 18) {
+      const f = Math.max(0, 1 - (Math.hypot(W - x, y) / 330));
+      if (f > 0) { ctx.beginPath(); ctx.arc(x, y, 3.2 * f, 0, Math.PI * 2); ctx.fill(); }
+    }
+
+    ctx.textAlign = "center";
+    ctx.fillStyle = p.color;
+    const BEBAS = '"Bebas Neue", Impact, sans-serif';
+    const eyebrow = `${state.name.toUpperCase()}, YOU GOT THE`;
+    fitFont(ctx, eyebrow, 400, 64, BEBAS, 900);
+    ctx.fillText(eyebrow, cx, 250);
+
+    const [w1, ...rest] = p.name.toUpperCase().split(" ");
+    const w2 = rest.join(" ");
+    ctx.font = `400 250px ${BEBAS}`;
+    const widest = ctx.measureText(w1).width >= ctx.measureText(w2).width ? w1 : w2;
+    fitFont(ctx, widest, 400, 250, BEBAS, 940);
+    ctx.fillText(w1, cx, 480);
+    ctx.fillText(w2, cx, 690);
+
+    ctx.fillStyle = "#000";
+    ctx.font = '500 46px "Oswald", Arial, sans-serif';
+    wrap(ctx, p.tag, cx, 790, 820, 58);
+
+    const ay = 1130, r = 250;
+    if (p.img) {
+      try {
+        const img = await loadImg(p.img);
+        const s = Math.min((r * 2) / img.width, (r * 2) / img.height);
+        ctx.drawImage(img, cx - img.width * s / 2, ay - img.height * s / 2, img.width * s, img.height * s);
+      } catch (_) {}
+    } else {
+      ctx.fillStyle = p.color + "66";
+      ctx.beginPath(); ctx.arc(cx, ay, r, 0, Math.PI * 2); ctx.fill();
+      ctx.setLineDash([14, 10]); ctx.lineWidth = 4; ctx.strokeStyle = "rgba(0,0,0,.45)"; ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = "#fff"; ctx.fillRect(cx - 170, ay - 36, 340, 72);
+      ctx.fillStyle = "#222"; ctx.font = '800 34px "DM Sans", Arial, sans-serif';
+      ctx.fillText(`ASSET · ${p.animal}`, cx, ay + 12);
+    }
+
+    ctx.fillStyle = "#000";
+    ctx.font = '500 44px "Oswald", Arial, sans-serif';
+    wrap(ctx, `You are part of the ${p.pct}% in Singapore who are ${p.plural}!`, cx, 1470, 820, 56);
+
+    const bw = 820, bh = 150, bx = cx - bw / 2, by = 1580;
+    ctx.fillStyle = "#000";
+    ctx.beginPath(); ctx.roundRect(bx, by, bw, bh, 75); ctx.fill();
+    ctx.fillStyle = "#fff";
+    const startTxt = p.start.toUpperCase().replace("!", "");
+    fitFont(ctx, startTxt, 400, 74, BEBAS, bw - 90);
+    ctx.fillText(startTxt, cx, by + 100);
+
+    await drawLogo(ctx, cx, 1770, 420, false);
+    ctx.fillStyle = "#000";
+    ctx.font = '500 32px "Oswald", Arial, sans-serif';
+    ctx.fillText(`Find yours at ${SHARE_DOMAIN}`, cx, 1870);
+
+    return new Promise(res => c.toBlob(res, "image/png"));
+  }
+
+  function download(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
+  }
+
+  function shareUrl() {
+    return `${location.href.split(/[?#]/)[0]}?r=${state.result}`;
+  }
+
+  async function copyText(text) {
+    try { await navigator.clipboard.writeText(text); return true; }
+    catch (_) {
+      const ta = document.createElement("textarea");
+      ta.value = text; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      const ok = document.execCommand("copy"); ta.remove(); return ok;
+    }
+  }
+
+  $$("[data-share]").forEach(btn => btn.addEventListener("click", async () => {
+    if (!state.result) return;
+    const kind = btn.dataset.share;
+    const p = PERSONAS[state.result];
+    const text = `I got the ${p.name}! Find out which legacy plan you should start with.`;
+
+    if (kind === "link") {
+      if (navigator.share && !isDesktop()) {
+        try { await navigator.share({ title: "Plan Your Legacy", text, url: shareUrl() }); return; } catch (_) {}
+      }
+      (await copyText(shareUrl())) ? toast("Link copied. Paste it anywhere to share!") : toast("Couldn't copy the link. Try again.");
+      return;
+    }
+
+    btn.disabled = true;
+    const blob = await buildCard();
+    btn.disabled = false;
+    if (!blob) { toast("Couldn't create your image. Try again."); return; }
+    const filename = `my-legacy-${state.result}.png`;
+
+    if (kind === "download") {
+      download(blob, filename);
+      toast("Result image saved.");
+      return;
+    }
+
+    const file = new File([blob], filename, { type: "image/png" });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file], title: "Plan Your Legacy", text }); return; }
+      catch (err) { if (err.name === "AbortError") return; }
+    }
+    download(blob, filename);
+    toast(`Image saved. Post it to your ${kind} Story!`);
+  }));
+})();
+</script>
+</body>
+</html>
