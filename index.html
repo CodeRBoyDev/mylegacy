@@ -666,7 +666,6 @@ h1,h2,p{margin:0}
         <p class="admin__note" id="admin-note"></p>
         <div class="admin__actions">
           <button class="btn" type="button" id="admin-xlsx">DOWNLOAD EXCEL</button>
-          <a class="btn btn--ghost" id="admin-sheet" href="#" target="_blank" rel="noopener" hidden>OPEN GOOGLE SHEET</a>
           <button class="btn btn--ghost" type="button" id="admin-refresh">REFRESH</button>
         </div>
       </div>
@@ -1273,9 +1272,6 @@ h1,h2,p{margin:0}
     $("#admin-xlsx").style.opacity = canDownload ? "" : ".4";
     $("#admin-refresh").disabled = !sheetReady || adminLoading;
     $("#admin-refresh").textContent = adminLoading ? "LOADING…" : "REFRESH";
-    const sheetLink = $("#admin-sheet");
-    sheetLink.hidden = !(adminData && adminData.sheetUrl);
-    if (adminData && adminData.sheetUrl) sheetLink.href = adminData.sheetUrl;
 
     const note = $("#admin-note");
     note.classList.toggle("is-warn", !sheetReady);
